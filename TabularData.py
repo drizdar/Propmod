@@ -11,7 +11,6 @@ import pandas as pd
 
 #%%#Membrane Types#############################################################
 # order is: name, k [L m-2 h-1], D [m^2/h], S [m], B [L m-2 h-1], A [L m-2 h-1 bar-1], material, ref
-# reference format is Journal of Environmental Modelling and Software.
 #note: standard membrane area of 372 m^2 is assumed - this is basically a legacy product now, but will be kept just in case
 #note: temperatures standardized at 25*C
 
@@ -92,10 +91,10 @@ Pt_dat = {
     #unless stated otherwise, cost data from "McGivney, W., Kawamura, S., 2008. Cost Estimating Manual for Water Treatment Facilities. John Wiley & Sons, Inc."
     #cost estimates are class 5 (+50%, -30%) - based on ENR CCI = 8889, Los Angeles California, (April, 2007)
     #conv is number that X is multiplied by, ex, if X is Q, assume going from L/hr to X_unit
-    "RswP":props.PTType("RswP","Raw surface water pumping", 0.038,"N/A",0,0,0,0,"N/A",0) 
-    ,"RgwP":props.PTType("RgwP","Raw groundwater pumping", 0.243,"N/A",0,0,0,0,"N/A",0)
-    ,"RM":props.PTType("RM","Rapid mixing", 0.011,"N/A",0,0,0,0,"N/A",0)
-    ,"Floc":props.PTType("Floc","Flocculation", 0.003,"N/A",0,0,0,0,"N/A",0)
+    "RswP":props.PTType("RswP","Raw surface water pumping", 0.038,"Linear",12169,60716,0,0,"MGD",6.3401E-6) #X range: 1 - 200, unit represents pump capacity
+    ,"RgwP":props.PTType("RgwP","Raw groundwater pumping", 0.243,"Linear",12169,60716,0,0,"MGD",6.3401E-6) #X range: 1 - 200, unit represents pump capacity
+    ,"RM":props.PTType("RM","Rapid mixing", 0.011,"N/A",0,0,0,0,"Gal",0) #Unit in book is for basin Vol
+    ,"Floc":props.PTType("Floc","Flocculation", 0.003,"N/A",0,0,0,0,"MG",0) #Unit in book is for basin Vol
     ,"Sed":props.PTType("Sed","Sedimentation", 0.004,"N/A",0,0,0,0,"N/A",0)
     ,"Chfs":props.PTType("Chfs","Chemical feed systems", 0.017,"N/A",0,0,0,0,"N/A",0)
     #cost values for MF and UF from "AWWA, 2008. Microfiltration and ultrafiltration membranes for drinking water. Journal (American Water Works Association) 100, 84–97."
@@ -108,13 +107,13 @@ Pt_dat = {
     ,"ROo":props.PTType("ROo","Reverse Osmosis (ocean water)", 3.170,"N/A",0,0,0,0,"N/A",0)
     ,"Daf":props.PTType("Daf","Dissolved air floatation", 0.029,"N/A",0,0,0,0,"N/A",0)
     ,"Ast":props.PTType("Ast","Air stripping", 0.099,"N/A",0,0,0,0,"N/A",0)
-    ,"Bwp":props.PTType("Bwp","Backwash water pumps", 0.004,"N/A",0,0,0,0,"N/A",0)
+    ,"Bwp":props.PTType("Bwp","Backwash water pumps", 0.004,"N/A",0,0,0,0,"SF",0) #Unit in book is for filter surface area
     ,"Rp":props.PTType("Rp","Residuals pumping", 0.001,"N/A",0,0,0,0,"N/A",0)
     ,"DisCl":props.PTType("DisCl","Onsite chlorine for generation", 0.022,"N/A",0,0,0,0,"N/A",0)
     ,"DisOz":props.PTType("DisOz","Ozone disinfection", 0.037,"N/A",0,0,0,0,"N/A",0)
     ,"DisUV":props.PTType("DisUV","UV disinfection", 0.016,"N/A",0,0,0,0,"N/A",0)
-    ,"Fwp":props.PTType("Fwp","Finished water pumping", 0.275,"N/A",0,0,0,0,"N/A",0)
-    ,"Npl":props.PTType("Npl","Nonprocess loads (buildings, HVAC, lighting, computers, etc.", 0.079,"N/A",0,0,0,0,"N/A",0) 
+    ,"Fwp":props.PTType("Fwp","Finished water pumping", 0.275,"Linear",18888,140743,0,0,"MGD",6.3401E-6) #Note, TDH = 100, X range is from 1.45 to 300, Xunit is for pump capacity
+    ,"Npl":props.PTType("Npl","Nonprocess loads (buildings, HVAC, lighting, computers, etc.", 0.079,"Power",63568,0,0,0.553,"MGD",6.3401E-6) #Xrange is 1 - 200 MGD for Plant Capacity, in book, this is for "Administration, Laboratory, and Maintenance Building" 
     }
 
 #%%#Hydraulics Data############################################################

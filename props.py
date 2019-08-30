@@ -137,7 +137,6 @@ class PTType:
 class MembraneType:
    '''
    Common base class for different membrane types.
-   References use Environmental Modelling & Software format.
    '''
 
    def __init__(self, name, k, D, S, B, A, mat, ref):

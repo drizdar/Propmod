@@ -139,7 +139,8 @@ class MembraneType:
    Common base class for different membrane types.
    '''
 
-   def __init__(self, name, k, D, S, B, A, mat, ref):
+   def __init__(self, name,id, k, D, S, B, A, mat, ref):
+      self.id = id
       self.name = name
       self.k = k
       self.D = D

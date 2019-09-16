@@ -153,13 +153,15 @@ compstmc = plotter.StackPlotCostUnit(comp_mincost2,"Min Cost")
 compstmc = plotter.StackPlotROIUnit(comp_mincost2,"Min Cost")
 #compstmw = plotter.StackPlotROI(comp_maxWnet,"Max Net Power")
 
-#ScatmPlot: inputs are: dataset1,dataset2,dataset3,x,y,title, line, SysCon2_inc
-#compcpw = plotter.ScatmPlot(roc_sw,sw_ww,roc_ww,'MW_net(MW)','Cost($)','Cost vs Net Power Comparison for Tampa Bay')
-compcpw = plotter.ScatmPlot(sw_ww,roc_ww2,roc_sw,'SE_net(kWh/m^3)','PV_net($)','Q_de(L/hr)','Unit NPV vs Specific Energy Comparison for Tampa Bay',comp_mincost2,1,0,0)
-#compcpw = plotter.ScatmPlot(roc_sw,sw_ww,roc_ww,'SE_net(kWh/m^3)','n_protr','# of Process Trains vs Specific Energy Comparison for Tampa Bay')
 
 #ROITPlot: inputs are proj,comp (the comparison dataset),case (e.g. sw_ww),OpTime
 ROIT_roc_ww = plotter.ROITPlot(proj,comp_mincost2,"roc_ww",TBdp.OpTime)
 
 end = timer()
 print(end - start) # Time in seconds
+
+#ScatmPlot: inputs are: dataset1,dataset2,dataset3,x,y,averager,spec,spec_inc, line, SysCon2_inc,interact,title
+#Note - interactive plot has title, non-interactive does not
+df4 = plotter.ScatmPlot(sw_ww,roc_ww2,roc_sw,'SE_net(kWh/m^3)','PV_net($)','Q_de(L/hr)',comp_mincost2,1,0,0,1,'Net Specific Energy vs Unit Net Present Value for each tested membrane')
+#compcpw = plotter.ScatmPlot(roc_sw,sw_ww,roc_ww,'SE_net(kWh/m^3)','n_protr','# of Process Trains vs Specific Energy Comparison for Tampa Bay')
+#Note, if the JSON -serializable error comes up for mpld3, see this fix by ceprio: https://github.com/mpld3/mpld3/issues/441

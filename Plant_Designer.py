@@ -99,8 +99,8 @@ SCRA_TBdpi = props.Tr_use("Tampa Bay Desalination Plant","South County Regional 
 #proj sets financial calc parameters - N (Max # years), EP (Energy price, $/kwh),
 #dEP (change in Energy Price per year, $), r (interest rate)
 #see the payback period - will be acceptable if less than 7 years
-#Set maximum years for payback period to 25
-proj = [40,0.09,0.003,0.03]
+#Set maximum years for payback period to 30
+proj = [30,0.09,0.003,0.03]
 
 #%%#Plant Comparer#############################################################
 '''
@@ -141,13 +141,13 @@ comp_mincost2 = pse.Compcg(sw_ww,roc_ww2,roc_sw,'Cost_Unit($/kW)','min')
 #compmwn = plotter.CompPlot(comp_maxWnet,"Max MW_net")
 #close("all") #closes graphs from previous run
 
-#StackPlot: imputs are: dataset,title
+#StackPlot: imputs are: dataset,proj,title
 #compstmc = plotter.StackPlotSE(comp_mincost2,"Min Cost - Pelton")
 compstmc = plotter.StackPlotSE(comp_mincost2,"Min Cost - RPE")
 
 #compstmw = plotter.StackPlotSE(comp_maxWnet,"Max Net Power")
 
-compstmc = plotter.StackPlotCostUnit(comp_mincost2,"Min Cost")
+compstmc = plotter.StackPlotCostUnit(comp_mincost2,proj,"Min Cost")
 #compstmw = plotter.StackPlotCost(comp_maxWnet,"Max Net Power")
 
 compstmc = plotter.StackPlotROIUnit(comp_mincost2,"Min Cost")

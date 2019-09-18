@@ -115,7 +115,7 @@ def StackPlotROI(comp,ptitle):
     return plt.show()
 
 ####Unit Stacked bar graph for Cost############################################
-def StackPlotCostUnit(comp,ptitle):
+def StackPlotCostUnit(comp,proj,ptitle):
     plt.rcParams["font.weight"] = "bold"
     plt.rcParams["axes.labelweight"] = "bold"
     N = 3
@@ -131,6 +131,7 @@ def StackPlotCostUnit(comp,ptitle):
     width = 0.35       # the width of the bars
     
     fig, ax = plt.subplots()
+    rects0 = ax.bar(ind, 25, width, color='w', alpha=0) 
     rects1 = ax.bar(ind, E6/1e3, width, color='orange') 
     rects2 = ax.bar(ind, E5/1e3, width, color='indigo') 
     rects3 = ax.bar(ind, E4/1e3, width, color='r') 
@@ -144,7 +145,40 @@ def StackPlotCostUnit(comp,ptitle):
     
     ax.set_xticks(ind)
     ax.set_xticklabels( ( 'SW-WW', 'ROC-WW', 'ROC-SW') )
-    plt.legend(['Eng-Legal-Admin Cost','Pipe-Elec-Prep Cost','Pretreatment Cost','Turbine Cost','Transmission Cost','Membrane Cost'])
+
+    pb_pd = comp['PB_pd(Yrs)'].copy()
+
+    def autolabel1(rects, xpos='center', pbpd='10',proj='30'):
+        """
+        Attach a text label above each bar in *rects*, displaying its height.
+    
+        *xpos* indicates which side to place the text w.r.t. the center of
+        the bar. It can be one of the following {'center', 'right', 'left'}.
+        """
+        
+        ha = {'center': 'center', 'right': 'left', 'left': 'right'}
+        offset = {'center': 0, 'right': 1, 'left': -1}
+
+        i = 0
+        for rect in rects:
+            height = rect.get_height()
+            if pbpd[i] == -404:
+                pbpd[i] = proj
+                ax.annotate('>{0} Years'.format(pbpd[i]),
+                            xy=(rect.get_x() + rect.get_width() / 2, height),
+                            xytext=(offset[xpos]*3, 3),  # use 3 points offset
+                            textcoords="offset points",  # in both directions
+                            ha=ha[xpos], va='bottom')
+            else:
+                ax.annotate('{0} Years'.format(pbpd[i]),
+                        xy=(rect.get_x() + rect.get_width() / 2, height),
+                        xytext=(offset[xpos]*3, 3),  # use 3 points offset
+                        textcoords="offset points",  # in both directions
+                        ha=ha[xpos], va='bottom')
+            i = i + 1
+
+    h = autolabel1(rects1, "center",pb_pd,proj[0])
+    plt.legend(['# of Years is Payback Period','Eng-Legal-Admin Cost','Pipe-Elec-Prep Cost','Pretreatment Cost','Turbine Cost','Transmission Cost','Membrane Cost'])
     return plt.show()
 
 

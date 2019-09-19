@@ -99,8 +99,8 @@ SCRA_TBdpi = props.Tr_use("Tampa Bay Desalination Plant","South County Regional 
 #proj sets financial calc parameters - N (Max # years), EP (Energy price, $/kwh),
 #dEP (change in Energy Price per year, $), r (interest rate)
 #see the payback period - will be acceptable if less than 7 years
-#Set maximum years for payback period to 25
-proj = [40,0.09,0.003,0.03]
+#Set maximum years for payback period to 30
+proj = [30,0.09,0.003,0.03]
 
 #%%#Plant Comparer#############################################################
 '''
@@ -141,25 +141,27 @@ comp_mincost2 = pse.Compcg(sw_ww,roc_ww2,roc_sw,'Cost_Unit($/kW)','min')
 #compmwn = plotter.CompPlot(comp_maxWnet,"Max MW_net")
 #close("all") #closes graphs from previous run
 
-#StackPlot: imputs are: dataset,title
+#StackPlot: imputs are: dataset,proj,title
 #compstmc = plotter.StackPlotSE(comp_mincost2,"Min Cost - Pelton")
 compstmc = plotter.StackPlotSE(comp_mincost2,"Min Cost - RPE")
 
 #compstmw = plotter.StackPlotSE(comp_maxWnet,"Max Net Power")
 
-compstmc = plotter.StackPlotCostUnit(comp_mincost2,"Min Cost")
+compstmc = plotter.StackPlotCostUnit(comp_mincost2,proj,"Min Cost")
 #compstmw = plotter.StackPlotCost(comp_maxWnet,"Max Net Power")
 
 compstmc = plotter.StackPlotROIUnit(comp_mincost2,"Min Cost")
 #compstmw = plotter.StackPlotROI(comp_maxWnet,"Max Net Power")
 
-#ScatmPlot: inputs are: dataset1,dataset2,dataset3,x,y,title, line, SysCon2_inc
-#compcpw = plotter.ScatmPlot(roc_sw,sw_ww,roc_ww,'MW_net(MW)','Cost($)','Cost vs Net Power Comparison for Tampa Bay')
-compcpw = plotter.ScatmPlot(sw_ww,roc_ww2,roc_sw,'SE_net(kWh/m^3)','PV_net($)','Q_de(L/hr)','Unit NPV vs Specific Energy Comparison for Tampa Bay',comp_mincost2,1,0,0)
-#compcpw = plotter.ScatmPlot(roc_sw,sw_ww,roc_ww,'SE_net(kWh/m^3)','n_protr','# of Process Trains vs Specific Energy Comparison for Tampa Bay')
 
 #ROITPlot: inputs are proj,comp (the comparison dataset),case (e.g. sw_ww),OpTime
 ROIT_roc_ww = plotter.ROITPlot(proj,comp_mincost2,"roc_ww",TBdp.OpTime)
 
 end = timer()
 print(end - start) # Time in seconds
+
+#ScatmPlot: inputs are: dataset1,dataset2,dataset3,x,y,averager,spec,spec_inc, line, SysCon2_inc,interact,title
+#Note - interactive plot has title, non-interactive does not
+df4 = plotter.ScatmPlot(sw_ww,roc_ww2,roc_sw,'SE_net(kWh/m^3)','PV_net($)','Q_de(L/hr)',comp_mincost2,1,0,0,1,'Net Specific Energy vs Unit Net Present Value for each tested membrane')
+#compcpw = plotter.ScatmPlot(roc_sw,sw_ww,roc_ww,'SE_net(kWh/m^3)','n_protr','# of Process Trains vs Specific Energy Comparison for Tampa Bay')
+#Note, if the JSON -serializable error comes up for mpld3, see this fix by ceprio: https://github.com/mpld3/mpld3/issues/441

@@ -232,12 +232,14 @@ def pte(PT_d,PT_f,PTopp,Q_f,Q_d,Q_m):
     return SE_PT, ptcd, ptcf
 
 #%%#Membrane System Performance Evaluator######################################
-def comboin(MemTyp,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,A_m,L_m,Mpv,MW_NaCl):
+def comboin(MemTyp,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl):
     'note: memTyp is from the props.MembraneType class, TurbType is from the props.TurbineType class'
     #sys_in = owfed(MemTyp.k,MemTyp.D,C_D,C_F,MemTyp.S,MemTyp.B,MemTyp.A,C_Vant)
-    sys_in = Mem_Flux.CntCurMod(C_Vant,MemTyp.k,MemTyp.D,MemTyp.S,MemTyp.B,MemTyp.A,A_m,L_m,Mpv,C_D,C_F,T)
+    sys_in = Mem_Flux.CntCurMod(C_Vant,MemTyp.k,MemTyp.D,MemTyp.S,MemTyp.B,MemTyp.A,M_geometry,C_D,C_F,T)
     #Tuple contains  Q_f[end],Q_d[end],Q_f[start],Q_d[start],W_avg,Se_avg,kw_gross,C_f[end],C_d[end],J_w_avg,dP,J_s_avg,SysCon
     #gross > net
+    A_m = M_geometry[6]
+    Mpv = M_geometry[8]
     Memb_LT = 7 #years, average membrane lifetime - assume complete system replacement every X years
     #V_mod = 0.03142 #m^3 Volume of an individual module, from "Baker, R.W., 2004. Membrane Technology and Applications, 2nd ed. John Wiley and Sons, Ltd."
     #Pd_mod = 775 #m^2/m^3 Packing Density, from "Sundaramoorthy, S., Srinivasan, G., Murthy, D.V.R., 2011. An analytical model for spiral wound reverse osmosis membrane modules: Part I — Model development and parameter estimation. Desalination 280, 403–411."
@@ -328,7 +330,7 @@ def comboin(MemTyp,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,Tropp,PT_d,PT_f,C
     return sys_in[9],sys_in[11],sys_in[4],sys_in[10],A_t,n_pv,n_protr,C_exit,Q_di,Q_fi,Q_de,Q_fe,SE_max_rev,SE_max_CoCur,SE_max_CntCur,SE_gross,SE_net,MW_gross,MW_net,E_net,\
             Cost_Memb,Cost_Tr,Cost_Turb,Cost_PT,Cost_Cons,Cost,Cost_Unit,Cost_OM,Cost_OM_Unit,Cost_OM_Unit2,PV_rev,PV_net,PB_pd,SE_Ineff,SE_PT,SE_Tr,MW_Ineff,MW_PT,MW_Tr,SysCon, SysCon2
 
-def combo(membs,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,A_m,L_m,Mpv,MW_NaCl):
+def combo(membs,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl):
     p = pd.Categorical(['J_w(L m-2 h-1)','J_s(g L m-2 h-1 kg-1)','W(W m-2)','dP(bar)','A_t(m^2)','n_pv','n_protr','C_exit(ppt)','Q_di(L/hr)','Q_fi(L/hr)','Q_de(L/hr)','Q_fe(L/hr)',\
             'SE_max_rev(kWh/m^3)','SE_max_CoCur(kWh/m^3)','SE_max_CntCur(kWh/m^3)','SE_gross(kWh/m^3)','SE_net(kWh/m^3)',\
             'MW_gross(MW)','MW_net(MW)','E_net(MWh/yr)','Cost_Memb($)','Cost_Tr($)','Cost_Turb($)','Cost_PT($)','Cost_Cons($)','Cost($)',\
@@ -337,7 +339,7 @@ def combo(membs,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,Tropp,PT_d,PT_f,C_Va
     it = 1
     for i in range(0,len(membs)):
         print('it = %s'%it)
-        j = comboin(membs[i],TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,A_m,L_m,Mpv,MW_NaCl)
+        j = comboin(membs[i],TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl)
         it = it + 1
         f = membs[i].name
         sys_out['%s'%f] = pd.Series(j)
@@ -376,7 +378,7 @@ def Compcg(sw_ww,roc_ww,roc_sw,varcomp,mmx):
 
 #%%#sensitivity and uncertainty analysis#######################################
 '''Returns all of the info as both a .csv file and a Pandas Dataframe'''
-def comboUSA(prob,N_Yrs,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,A_m,L_m,Mpv,g,MW_NaCl,csv_name):
+def comboUSA(prob,N_Yrs,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,g,MW_NaCl,csv_name):
     import TabularData as td
     import props
     #membs = prob[:,0:5]
@@ -412,7 +414,7 @@ def comboUSA(prob,N_Yrs,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,A_m,L_m,Mpv,g,MW_Na
     for i in range(0,len(Turbeff)): #len Turbeff is arbitraty, any length will work
         print('it = {0}/{1}'.format(it,l))
         #Create a synthetic membrane
-        memb = props.MembraneType('%s'%it,k[i],D[i],S[i],B[i],A[i],"material","ref")
+        memb = props.MembraneType('%s'%it,'%s'%it,k[i],D[i],S[i],B[i],A[i],"material","ref")
         #Create a synthetic turbine for analysis
         TurbTyp = props.TurbineType("Turb", Turbeff[i])
         #Create a synthetic pipe network - # bends, material, and pipe size kept same as Tampa case for consistency
@@ -424,7 +426,7 @@ def comboUSA(prob,N_Yrs,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,A_m,L_m,Mpv,g,MW_Na
                       [td.kL_vals['Entrance']['Slightly rounded'],td.kL_vals['Exit']['Slightly rounded'],
                        td.kL_vals['Elbows']['Long radius 90°, flanged']*4,td.kL_vals['Elbows']['Long radius 45°, flanged']*2])
         j = comboin(memb,TurbTyp,Tr_usei,Q[i],C_D[i],C_F[i],proj[i],OpTime[i],Cms[i],T[i],\
-                    Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,A_m,L_m,Mpv,MW_NaCl)
+                    Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl)
         it = it + 1
         f = memb.name
         sys_out['%s'%f] = pd.Series(j)

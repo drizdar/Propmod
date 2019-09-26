@@ -35,6 +35,8 @@ inf = 1.2089 #inflation from September 2007 to November 2018 for cost estimates,
 A_m = 40.88 #m^2 ~440 sq. ft, from VI email chain
 L_m = 1.016 #m - membrane element length (A)
 Mpv = 7 #number of membrane elements per pressure vessel
+h_c = 0.0007 #m - channel height
+l_f = 0.0045 #m - length between spacers
 
 T = 31.6 #deg C
 mu  = 0.001*(1 + 0.636*(T-20)/41)**(-1/0.636)   #Kg m-1 s-1 -> from "Pawlowski, J., 1991. Veränderliche Stoffgrössen in der Ähnlichkeitstheorie. Frankfurt am Main: Salle."
@@ -44,13 +46,22 @@ rho = 999.84847 + 6.337563e-2 * T - 8.523829e-3 * (T**2) + 6.943248e-5 * (T**3) 
 Cms = 5.80 #$/m^2, from "Naghiloo, A., Abbaspour, M., Mohammadi-Ivatloo, B., Bakhtari, K., 2015. Modeling and design of a 25 MW osmotic power plant (PRO) on Bahmanshir River of Iran. Renew Energ 78, 51–59."
 #Cms = 12.23 #$/m2 from VI email chain (440 ft^2 per element, around $500 each - email says 400 ft2, but Dow website says 440, so I'll go with Dow)
 
-#%%#Membrane Types#############################################################
+
+#%%#Membrane and spacer Types#############################################################
 membs = td.membs
 
 memdat = pd.DataFrame.from_records([s.to_dict() for s in membs]) #DataFrame with all membrane data - not in order
 memdat.set_index("0_Name", inplace=True)
 
-membs[0].displayStats()                          
+membs[0].displayStats() 
+
+sd = td.Spacer_dat
+Spacers = pd.DataFrame.from_records([sd[s].to_dict(h_c,l_f) for s, value in sd.items()]) #values in to_dict are h_c, l_f, in m
+Spacers.set_index("Shape", inplace=True)
+
+shape = "1:3 ellipse"
+M_geometry = [Spacers.loc[shape,"alpha"],Spacers.loc[shape,"beta"],1,Spacers.loc[shape,"d_h"],
+              h_c, l_f, A_m, L_m, Mpv] #values are alpha, beta, gamma, d_h, h_c, l_f, A_m, L_m, Mpv
           
 #%%#Plants and Objects#########################################################
 #Create Plants
@@ -105,7 +116,7 @@ proj = [30,0.09,0.003,0.03]
 #%%#Plant Comparer#############################################################
 '''
 note: format is pse.combo(membs,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,\
-Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,A_m,L_m,Mpv,MW_NaCl
+Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl
 #PTopp: 0 - no pretreatment, 1 - Draw Pretreatment, 2 = Feed pretreatment, 3 = feed and draw pretreatment
 #Tropp = 1 = transmission, 0 = no transmission
 #Assume ROC and WW do not need pretreatment - place Pt['MF'] in as a default though to make code work
@@ -113,16 +124,16 @@ Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,A_m,L_m,Mpv,MW_NaCl
 #PV_rev and PV_net represent present value of revenue and net present value (revenue - cost) over given time-frame (first # in proj())
 '''
 #roc_ww = pse.combo(membs,RPE,HCww_TBdpi,TBdp.Q_ROC,TBdp.C_ROC,HCww.C_Eff,proj,TBdp.OpTime,Cms,T,\
-#                   1,Pt['MF'],Pt['MF'],C_Vant,0,inf,v,R,A_m,L_m,Mpv,MW_NaCl)
+#                   1,Pt['MF'],Pt['MF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
 
 roc_ww2 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,\
-                   1,Pt['MF'],Pt['MF'],C_Vant,0,inf,v,R,A_m,L_m,Mpv,MW_NaCl)
+                   1,Pt['MF'],Pt['MF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
 
 sw_ww = pse.combo(membs,Pelton,HCww_TBdpi,HCww.Q_Eff,HCww.C_SW,HCww.C_Eff,proj,HCww.OpTime,Cms,T,\
-                   0,Pt['MF'],Pt['MF'],C_Vant,1,inf,v,R,A_m,L_m,Mpv,MW_NaCl)
+                   0,Pt['MF'],Pt['MF'],C_Vant,1,inf,v,R,M_geometry,MW_NaCl)
 
 roc_sw = pse.combo(membs,RPE,HCww_TBdpi,TBdp.Q_ROC,TBdp.C_ROC,TBdp.C_SW,proj,TBdp.OpTime,Cms,T,\
-                   0,Pt['MF'],Pt['MF'],C_Vant,2,inf,v,R,A_m,L_m,Mpv,MW_NaCl)
+                   0,Pt['MF'],Pt['MF'],C_Vant,2,inf,v,R,M_geometry,MW_NaCl)
 
 #mincost - based on unit cost
 #comp_mincost = pse.Compcg(sw_ww,roc_ww,roc_sw,'Cost_Unit($/kW)','min')

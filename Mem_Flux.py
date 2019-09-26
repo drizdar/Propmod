@@ -40,7 +40,18 @@ C_F = 0.01 #g/kg, solute concentration on feed side
 T = 22 #deg C
 """
 
-def CoCurMod(C_Vant,k,D,S,B,A,A_m,L_m,Mpv,C_D,C_F,T):
+def CoCurMod(C_Vant,k,D,S,B,A,M_geometry,C_D,C_F,T):
+    #M_geometry imports
+    a = M_geometry[0] #alpha
+    b = M_geometry[1] #beta
+    gma = M_geometry[2] #gamma
+    d_h = M_geometry[3]
+    h_c = M_geometry[4]
+    l_f = M_geometry[5]
+    A_m = M_geometry[6]
+    L_m = M_geometry[7]
+    Mpv = M_geometry[8]
+
     p_D = pse.swden(C_D,T)/1000 #kg/L
     p_F = pse.swden(C_F,T)/1000 #kg/L
     Ld = A_m / L_m #m^2/m, represents linear density of membrane surface -> multiply Q values by this amount to get total flow capacity
@@ -50,6 +61,7 @@ def CoCurMod(C_Vant,k,D,S,B,A,A_m,L_m,Mpv,C_D,C_F,T):
     L_mt = L_m * Mpv #multiply length by number of elements per pressure vessel
     s_vec = np.linspace(0,L_mt,N) #start at 0, increment to A_m and the length of the vector is N
     ds = s_vec[2]-s_vec[1] #m^2
+    
     
     #Discretize
     C_d = np.zeros((N,1)) #a 1 by N array
@@ -135,8 +147,20 @@ def CoCurMod(C_Vant,k,D,S,B,A,A_m,L_m,Mpv,C_D,C_F,T):
     return int(np.round(Q_f[0])),int(np.round(Q_d[0])),int(np.round(Q_f[N-1])),int(np.round(Q_d[N-1])),float(J_s[0]),float(J_w[0]),W_avg,Se_avg,kw_gross,float(C_f[N-1]),float(C_d[N-1]),float(J_w_avg),dP,float(J_s_avg)
 
 
-def CntCurMod(C_Vant,k,D,S,B,A,A_m,L_m,Mpv,C_D,C_F,T):
-    CoCur = CoCurMod(C_Vant,k,D,S,B,A,A_m,L_m,Mpv,C_D,C_F,T)
+def CntCurMod(C_Vant,k,D,S,B,A,M_geometry,C_D,C_F,T):
+    CoCur = CoCurMod(C_Vant,k,D,S,B,A,M_geometry,C_D,C_F,T)
+    
+    #M_geometry imports
+    a = M_geometry[0] #alpha
+    b = M_geometry[1] #beta
+    gma = M_geometry[2] #gamma
+    d_h = M_geometry[3]
+    h_c = M_geometry[4]
+    l_f = M_geometry[5]
+    A_m = M_geometry[6]
+    L_m = M_geometry[7]
+    Mpv = M_geometry[8]
+
     Ld = A_m / L_m #m^2/m, represents linear density of membrane surface -> multiply Q values by this amount to get total flow capacity
     if CoCur[4] > CoCur[5]:
         SysCon = 0
@@ -290,4 +314,4 @@ def CntCurMod(C_Vant,k,D,S,B,A,A_m,L_m,Mpv,C_D,C_F,T):
     SysCon = 1
     return int(np.round(Q_f[0])),int(np.round(Q_d[N-1])),int(np.round(Q_f[N-1])),int(np.round(Q_d[0])),W_avg,Se_avg,kw_gross,float(C_f[0]),float(C_d[N-1]),J_w_avg,dP,J_s_avg,SysCon
 
-#TestThingn = CntCurMod(C_Vant,k,D,S,B,A,A_m,L_m,Mpv,C_D,C_F,T) #Copy and paste this in if you want it to run - for some reason, doesn't work otherwise
+#TestThingn = CntCurMod(C_Vant,k,D,S,B,A,M_geometry,C_D,C_F,T) #Copy and paste this in if you want it to run - for some reason, doesn't work otherwise

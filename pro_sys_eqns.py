@@ -11,7 +11,6 @@ import operator
 from scipy.optimize import brentq
 import pandas as pd
 import numpy as np
-import Mem_Flux
 import os
 
 
@@ -232,10 +231,11 @@ def pte(PT_d,PT_f,PTopp,Q_f,Q_d,Q_m):
     return SE_PT, ptcd, ptcf
 
 #%%#Membrane System Performance Evaluator######################################
-def comboin(MemTyp,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl):
+def comboin(MemTyp,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,mu,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl):
+    import Mem_Flux
     'note: memTyp is from the props.MembraneType class, TurbType is from the props.TurbineType class'
     #sys_in = owfed(MemTyp.k,MemTyp.D,C_D,C_F,MemTyp.S,MemTyp.B,MemTyp.A,C_Vant)
-    sys_in = Mem_Flux.CntCurMod(C_Vant,MemTyp.k,MemTyp.D,MemTyp.S,MemTyp.B,MemTyp.A,M_geometry,C_D,C_F,T)
+    sys_in = Mem_Flux.CntCurMod(C_Vant,MemTyp.k,MemTyp.D,MemTyp.S,MemTyp.B,MemTyp.A,M_geometry,C_D,C_F,T,mu)
     #Tuple contains  Q_f[end],Q_d[end],Q_f[start],Q_d[start],W_avg,Se_avg,kw_gross,C_f[end],C_d[end],J_w_avg,dP,J_s_avg,SysCon
     #gross > net
     A_m = M_geometry[6]
@@ -330,7 +330,7 @@ def comboin(MemTyp,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,Tropp,PT_d,PT_f,C
     return sys_in[9],sys_in[11],sys_in[4],sys_in[10],A_t,n_pv,n_protr,C_exit,Q_di,Q_fi,Q_de,Q_fe,SE_max_rev,SE_max_CoCur,SE_max_CntCur,SE_gross,SE_net,MW_gross,MW_net,E_net,\
             Cost_Memb,Cost_Tr,Cost_Turb,Cost_PT,Cost_Cons,Cost,Cost_Unit,Cost_OM,Cost_OM_Unit,Cost_OM_Unit2,PV_rev,PV_net,PB_pd,SE_Ineff,SE_PT,SE_Tr,MW_Ineff,MW_PT,MW_Tr,SysCon, SysCon2
 
-def combo(membs,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl):
+def combo(membs,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,mu,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl):
     p = pd.Categorical(['J_w(L m-2 h-1)','J_s(g L m-2 h-1 kg-1)','W(W m-2)','dP(bar)','A_t(m^2)','n_pv','n_protr','C_exit(ppt)','Q_di(L/hr)','Q_fi(L/hr)','Q_de(L/hr)','Q_fe(L/hr)',\
             'SE_max_rev(kWh/m^3)','SE_max_CoCur(kWh/m^3)','SE_max_CntCur(kWh/m^3)','SE_gross(kWh/m^3)','SE_net(kWh/m^3)',\
             'MW_gross(MW)','MW_net(MW)','E_net(MWh/yr)','Cost_Memb($)','Cost_Tr($)','Cost_Turb($)','Cost_PT($)','Cost_Cons($)','Cost($)',\
@@ -339,7 +339,7 @@ def combo(membs,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,Tropp,PT_d,PT_f,C_Va
     it = 1
     for i in range(0,len(membs)):
         print('it = %s'%it)
-        j = comboin(membs[i],TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl)
+        j = comboin(membs[i],TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,mu,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl)
         it = it + 1
         f = membs[i].name
         sys_out['%s'%f] = pd.Series(j)

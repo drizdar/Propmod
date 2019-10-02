@@ -29,8 +29,6 @@ R = 0.083144598 #L-bar/mol-K
 MW_NaCl = 58.442769 #g/mol
 C_Vant = (v*R/MW_NaCl) #L-bar/g-K - Van't Hoff Coefficient (Modified)
 R = 2.30957E-06 #kWh/Mol-K #Change Units of R
-g = 9.81 #m/s^2
-inf = 1.2089 #inflation from September 2007 to November 2018 for cost estimates, from https://www.bls.gov/data/inflation_calculator.htm
 #Note: Inflation value for Turbine (Found in pse) may also need to be adjusted depending on when model is ran
 A_m = 40.88 #m^2 ~440 sq. ft, from VI email chain
 L_m = 1.016 #m - membrane element length (A)
@@ -45,6 +43,8 @@ rho = 999.84847 + 6.337563e-2 * T - 8.523829e-3 * (T**2) + 6.943248e-5 * (T**3) 
 #Cms = 14.18 #Converted from Au $ to USD under exchange rate of 0.709 USD/Au $ From "Helfer, F., Lemckert, C., 2015. The power of salinity gradients: An Australian example. Renewable and Sustainable Energy Reviews 50, 1–16."
 Cms = 5.80 #$/m^2, from "Naghiloo, A., Abbaspour, M., Mohammadi-Ivatloo, B., Bakhtari, K., 2015. Modeling and design of a 25 MW osmotic power plant (PRO) on Bahmanshir River of Iran. Renew Energ 78, 51–59."
 #Cms = 12.23 #$/m2 from VI email chain (440 ft^2 per element, around $500 each - email says 400 ft2, but Dow website says 440, so I'll go with Dow)
+g = 9.81 #m/s^2
+inf = 1.2089 #inflation from September 2007 to November 2018 for cost estimates, from https://www.bls.gov/data/inflation_calculator.htm
 
 
 #%%#Membrane and spacer Types#############################################################
@@ -115,7 +115,7 @@ proj = [30,0.09,0.003,0.03]
 
 #%%#Plant Comparer#############################################################
 '''
-note: format is pse.combo(membs,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,\
+note: format is pse.combo(membs,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,mu\
 Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl
 #PTopp: 0 - no pretreatment, 1 - Draw Pretreatment, 2 = Feed pretreatment, 3 = feed and draw pretreatment
 #Tropp = 1 = transmission, 0 = no transmission
@@ -126,13 +126,13 @@ Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl
 #roc_ww = pse.combo(membs,RPE,HCww_TBdpi,TBdp.Q_ROC,TBdp.C_ROC,HCww.C_Eff,proj,TBdp.OpTime,Cms,T,\
 #                   1,Pt['MF'],Pt['MF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
 
-roc_ww2 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,\
+roc_ww2 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,mu,\
                    1,Pt['MF'],Pt['MF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
 
-sw_ww = pse.combo(membs,Pelton,HCww_TBdpi,HCww.Q_Eff,HCww.C_SW,HCww.C_Eff,proj,HCww.OpTime,Cms,T,\
+sw_ww = pse.combo(membs,Pelton,HCww_TBdpi,HCww.Q_Eff,HCww.C_SW,HCww.C_Eff,proj,HCww.OpTime,Cms,T,mu,\
                    0,Pt['MF'],Pt['MF'],C_Vant,1,inf,v,R,M_geometry,MW_NaCl)
 
-roc_sw = pse.combo(membs,RPE,HCww_TBdpi,TBdp.Q_ROC,TBdp.C_ROC,TBdp.C_SW,proj,TBdp.OpTime,Cms,T,\
+roc_sw = pse.combo(membs,RPE,HCww_TBdpi,TBdp.Q_ROC,TBdp.C_ROC,TBdp.C_SW,proj,TBdp.OpTime,Cms,T,mu,\
                    0,Pt['MF'],Pt['MF'],C_Vant,2,inf,v,R,M_geometry,MW_NaCl)
 
 #mincost - based on unit cost

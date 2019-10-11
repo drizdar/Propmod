@@ -137,7 +137,7 @@ def StackPlotCostUnit(comp,proj,ptitle):
     rects4 = ax.bar(ind, E3/1e3, width, color='b') 
     rects5 = ax.bar(ind, E2/1e3, width, color='g')
     rects6 = ax.bar(ind, E1/1e3, width, color='cyan')
-    rects7 = ax.bar(ind, 25, width, color='w', alpha=0) 
+    rects7 = ax.bar(ind, (E6/1e3)+3, width, color='w', alpha=0) 
 
     # add some text for labels, title and axes ticks
     ax.set_ylabel('Unit Cost ($ kW^-1) (Thousands)')

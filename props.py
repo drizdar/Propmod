@@ -201,8 +201,8 @@ class Tr_use:
       import pro_sys_eqns as pse
       Tr_use = pse.engeq(self.ks,self.D,self.rho,self.mu,self.z1,self.z2, \
                          self.L,self.g,self.Q,self.Pump,self.inf,self.kLtot) #kWh/m^3
-      Tr_use_dat = pd.Series([Tr_use[0],Tr_use[1],Tr_use[2],Tr_use[3],Tr_use[4],Tr_use[5],Tr_use[6],Tr_use[7]],
-                             index=['Tr_use(kWh/m^3)', 'Pump Head(m)', 'P(kW)', 'D(m)','V(m/s)','Pipe Cost($)','Pump Cost($)','Total Cost($)'])
+      Tr_use_dat = pd.Series([Tr_use[0],Tr_use[1],Tr_use[2],Tr_use[3],Tr_use[4],Tr_use[5],Tr_use[6],Tr_use[7],Tr_use[8],Tr_use[9]],
+                             index=['Tr_use(kWh/m^3)', 'Pump Head(m)', 'P(kW)', 'D(m)','V(m/s)','Pipe Cost($)','Pump Cost($)','Total Cost($)','a','n'])
       #s1 = pd.Series([1,2,3,4,5,6], index=pd.date_range('20130102', periods=6))
       return Tr_use_dat
    

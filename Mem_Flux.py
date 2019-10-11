@@ -159,13 +159,13 @@ def CoCurMod(C_Vant,k,D,S,B,A,M_geometry,C_D,C_F,T,mu):
     Q_f = np.multiply(Q_f,Ld) #scale Q by linear density
     Q_d = np.multiply(Q_d,Ld)
     
-    W_avg = float((dP[0]*(Q_d[N-1]-Q_d[0])/A_mt)/36) #W/m^2 - for system
+    W_avg = float((np.mean(dP)*(Q_d[N-1]-Q_d[0])/A_mt)/36) #W/m^2 - for system
     J_w_avg = np.mean(J_w)
     J_s_avg = np.mean(J_s)
     
     #W3 = sys_in[1] - same as W2, just different form
     
-    Se_avg = float(((dP[0]*(Q_d[N-1]-Q_d[0]))/(Q_d[0]+Q_f[0]))/36) #kWh/m^3
+    Se_avg = float(((np.mean(dP)*(Q_d[N-1]-Q_d[0]))/(Q_d[0]+Q_f[0]))/36) #kWh/m^3
     kw_gross = float((Q_d[N-1] * Se_avg)/1e3)
     """
     W2 = float(J_w[0] * dP * (1/36)) #W/m^2 - max based on coupon scale system
@@ -177,7 +177,7 @@ def CoCurMod(C_Vant,k,D,S,B,A,M_geometry,C_D,C_F,T,mu):
     print("Cocur system max theoretical values: SE_max %f kWh/m^3,"%Se_gross_max,"kW_gross_max = %f kW,"%kw_gross_max,"W_coupon = %f W/m^2 (for coupon scale membrane)"%W2 )
     print("Cocur % of max: SE =",((Se_avg/Se_gross_max)*100),"%, kW_gross = ",((kw_gross/kw_gross_max)*100),"%, W_avg = ",((W_avg/W2)*100),"%")
     """
-    return int(np.round(Q_f[0])),int(np.round(Q_d[0])),int(np.round(Q_f[N-1])),int(np.round(Q_d[N-1])),float(J_s[0]),float(J_w[0]),W_avg,Se_avg,kw_gross,float(C_f[N-1]),float(C_d[N-1]),float(J_w_avg),float(dP[0]),float(J_s_avg)
+    return int(np.round(Q_f[0])),int(np.round(Q_d[0])),int(np.round(Q_f[N-1])),int(np.round(Q_d[N-1])),float(J_s[0]),float(J_w[0]),W_avg,Se_avg,kw_gross,float(C_f[N-1]),float(C_d[N-1]),float(J_w_avg),float(dP[0]),float(J_s_avg),float(dP[N-1])
 
 
 def CntCurMod(C_Vant,k,D,S,B,A,M_geometry,C_D,C_F,T,mu):
@@ -197,8 +197,8 @@ def CntCurMod(C_Vant,k,D,S,B,A,M_geometry,C_D,C_F,T,mu):
     Ld = A_m / L_m #m^2/m, represents linear density of membrane surface -> multiply Q values by this amount to get total flow capacity - equivalent to hm - membrane height
     if CoCur[4] > CoCur[5]:
         SysCon = 0
-        #Tuple contains  Q_f[end],Q_d[end],Q_f[start],Q_d[start],W_avg,Se_avg,kw_gross,C_f[end],C_d[end],J_w_avg,dP[0],SysCon
-        return CoCur[2],CoCur[3],CoCur[0],CoCur[1],CoCur[6],CoCur[7],CoCur[8],CoCur[9],CoCur[10],CoCur[11],CoCur[12],CoCur[13],SysCon
+        #Tuple contains  Q_f[end],Q_d[end],Q_f[start],Q_d[start],W_avg,Se_avg,kw_gross,C_f[end],C_d[end],J_w_avg,dP[0],J_s_avg,SysCon,dP[end]
+        return CoCur[2],CoCur[3],CoCur[0],CoCur[1],CoCur[6],CoCur[7],CoCur[8],CoCur[9],CoCur[10],CoCur[11],CoCur[12],CoCur[13],SysCon,CoCur[14]
     
     
     A_mt = A_m * Mpv #multiply area by number of elements per pressure vessel
@@ -287,8 +287,8 @@ def CntCurMod(C_Vant,k,D,S,B,A,M_geometry,C_D,C_F,T,mu):
     
     if Ccc == 1:
         SysCon = 0
-        #Tuple contains  Q_f[end],Q_d[end],Q_f[start],Q_d[start],W_avg,Se_avg,kw_gross,C_f[end],C_d[end],J_w_avg,dP[0],SysCon,J_s_avg
-        return CoCur[2],CoCur[3],CoCur[0],CoCur[1],CoCur[6],CoCur[7],CoCur[8],CoCur[9],CoCur[10],CoCur[11],CoCur[12],CoCur[13],SysCon
+        #Tuple contains  Q_f[end],Q_d[end],Q_f[start],Q_d[start],W_avg,Se_avg,kw_gross,C_f[end],C_d[end],J_w_avg,dP[0],J_s_avg, SysCon,dP[end]
+        return CoCur[2],CoCur[3],CoCur[0],CoCur[1],CoCur[6],CoCur[7],CoCur[8],CoCur[9],CoCur[10],CoCur[11],CoCur[12],CoCur[13],SysCon,CoCur[14]
             
     it = 1
     #it2 = 1
@@ -338,12 +338,12 @@ def CntCurMod(C_Vant,k,D,S,B,A,M_geometry,C_D,C_F,T,mu):
     Q_d = np.multiply(Q_d,Ld)
     
     
-    W_avg = float((dP[0]*(Q_d[N-1]-Q_d[0])/A_mt)/36) #W/m^2 - for system
+    W_avg = float((np.mean(dP)*(Q_d[N-1]-Q_d[0])/A_mt)/36) #W/m^2 - for system
     #W3 = sys_in[1] - same as W2, just different form
     J_w_avg = np.mean(J_w)
     J_s_avg = np.mean(J_s)
     
-    Se_avg = float(((dP[0]*(Q_d[N-1]-Q_d[0]))/(Q_d[0]+Q_f[N-1]))/36) #kWh/m^3
+    Se_avg = float(((np.mean(dP)*(Q_d[N-1]-Q_d[0]))/(Q_d[0]+Q_f[N-1]))/36) #kWh/m^3
     kw_gross = float((Q_d[N-1] * Se_avg)/1e3)
     """
     W2 = float(J_w[0] * dP * (1/36)) #W/m^2 - max based on coupon scale system
@@ -360,6 +360,6 @@ def CntCurMod(C_Vant,k,D,S,B,A,M_geometry,C_D,C_F,T,mu):
     print("% of max: SE =",(Se_avg/Se_gross_max),"%, kW_gross = ",(kw_gross/kw_gross_max),"%, W_avg = ",(W_avg/W2),"%")
     """
     SysCon = 1
-    return int(np.round(Q_f[0])),int(np.round(Q_d[N-1])),int(np.round(Q_f[N-1])),int(np.round(Q_d[0])),W_avg,Se_avg,kw_gross,float(C_f[0]),float(C_d[N-1]),J_w_avg,float(dP[0]),J_s_avg,SysCon
+    return int(np.round(Q_f[0])),int(np.round(Q_d[N-1])),int(np.round(Q_f[N-1])),int(np.round(Q_d[0])),W_avg,Se_avg,kw_gross,float(C_f[0]),float(C_d[N-1]),J_w_avg,float(dP[0]),J_s_avg,SysCon,float(dP[N-1])
 
 TestThingn = CntCurMod(C_Vant,k,D,S,B,A,M_geometry,C_D,C_F,T,mu) #Copy and paste this in if you want it to run - for some reason, doesn't work otherwise

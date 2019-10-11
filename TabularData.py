@@ -75,7 +75,7 @@ Pump_dat = {
     #cost curves cover entire pump station cost, based on $/horsepower
     #cost estimates are class 5 (+50%, -30%) - based on ENR CCI = 8889, Los Angeles California, (April, 2007)
     #Pump Efficiency values from "Hammer, M.J., Hammer, Jr., M.J., 2012. Water and Wastewater Technology, 7th ed. Pearson Education Inc., Upper Saddle River, NJ."
-    "Sub":props.PumpType("Sub","Submersible", 0.75, 16599, 0.695)
+    "Sub":props.PumpType("Sub","Submersible", 0.89, 16599, 0.695) #eff based on river water pump from loeb 2002 paper
     ,"Horiz":props.PumpType("Horiz","Horizontal", 0.75, 62040, 0.6128)
     ,"Vert":props.PumpType("Vert","Submersible", 0.75, 26238, 0.619)
     }

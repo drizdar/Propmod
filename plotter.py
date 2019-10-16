@@ -131,13 +131,13 @@ def StackPlotCostUnit(comp,proj,ptitle):
     width = 0.35       # the width of the bars
     
     fig, ax = plt.subplots()
-    rects0 = ax.bar(ind, 25, width, color='w', alpha=0) 
     rects1 = ax.bar(ind, E6/1e3, width, color='orange') 
     rects2 = ax.bar(ind, E5/1e3, width, color='indigo') 
     rects3 = ax.bar(ind, E4/1e3, width, color='r') 
     rects4 = ax.bar(ind, E3/1e3, width, color='b') 
     rects5 = ax.bar(ind, E2/1e3, width, color='g')
     rects6 = ax.bar(ind, E1/1e3, width, color='cyan')
+    rects7 = ax.bar(ind, (E6/1e3)+3, width, color='w', alpha=0) 
 
     # add some text for labels, title and axes ticks
     ax.set_ylabel('Unit Cost ($ kW^-1) (Thousands)')
@@ -178,7 +178,8 @@ def StackPlotCostUnit(comp,proj,ptitle):
             i = i + 1
 
     h = autolabel1(rects1, "center",pb_pd,proj[0])
-    plt.legend(['# of Years is Payback Period','Eng-Legal-Admin Cost','Pipe-Elec-Prep Cost','Pretreatment Cost','Turbine Cost','Transmission Cost','Membrane Cost'])
+    plt.legend(['Eng-Legal-Admin Cost','Pipe-Elec-Prep Cost','Pretreatment Cost','Turbine Cost','Transmission Cost','Membrane Cost'])
+    #'# of Years is Payback Period'
     return plt.show()
 
 

@@ -29,12 +29,12 @@ R = 0.083144598 #L-bar/mol-K
 MW_NaCl = 58.442769 #g/mol
 C_Vant = (v*R/MW_NaCl) #L-bar/g-K - Van't Hoff Coefficient (Modified)
 R = 2.30957E-06 #kWh/Mol-K #Change Units of R
-g = 9.81 #m/s^2
-inf = 1.2089 #inflation from September 2007 to November 2018 for cost estimates, from https://www.bls.gov/data/inflation_calculator.htm
 #Note: Inflation value for Turbine (Found in pse) may also need to be adjusted depending on when model is ran
 A_m = 40.88 #m^2 ~440 sq. ft, from VI email chain
 L_m = 1.016 #m - membrane element length (A)
 Mpv = 7 #number of membrane elements per pressure vessel
+h_c = 0.0007 #m - channel height
+l_f = 0.0045 #m - length between spacers
 
 T = 31.6 #deg C
 mu  = 0.001*(1 + 0.636*(T-20)/41)**(-1/0.636)   #Kg m-1 s-1 -> from "Pawlowski, J., 1991. Veränderliche Stoffgrössen in der Ähnlichkeitstheorie. Frankfurt am Main: Salle."
@@ -43,21 +43,32 @@ rho = 999.84847 + 6.337563e-2 * T - 8.523829e-3 * (T**2) + 6.943248e-5 * (T**3) 
 #Cms = 14.18 #Converted from Au $ to USD under exchange rate of 0.709 USD/Au $ From "Helfer, F., Lemckert, C., 2015. The power of salinity gradients: An Australian example. Renewable and Sustainable Energy Reviews 50, 1–16."
 Cms = 5.80 #$/m^2, from "Naghiloo, A., Abbaspour, M., Mohammadi-Ivatloo, B., Bakhtari, K., 2015. Modeling and design of a 25 MW osmotic power plant (PRO) on Bahmanshir River of Iran. Renew Energ 78, 51–59."
 #Cms = 12.23 #$/m2 from VI email chain (440 ft^2 per element, around $500 each - email says 400 ft2, but Dow website says 440, so I'll go with Dow)
+g = 9.81 #m/s^2
+inf = 1.2089 #inflation from September 2007 to November 2018 for cost estimates, from https://www.bls.gov/data/inflation_calculator.htm
 
-#%%#Membrane Types#############################################################
+
+#%%#Membrane and spacer Types#############################################################
 membs = td.membs
 
 memdat = pd.DataFrame.from_records([s.to_dict() for s in membs]) #DataFrame with all membrane data - not in order
 memdat.set_index("0_Name", inplace=True)
 
-membs[0].displayStats()                          
+membs[0].displayStats() 
+
+sd = td.Spacer_dat
+Spacers = pd.DataFrame.from_records([sd[s].to_dict(h_c,l_f) for s, value in sd.items()]) #values in to_dict are h_c, l_f, in m
+Spacers.set_index("Shape", inplace=True)
+
+shape = "1:3 ellipse"
+M_geometry = [Spacers.loc[shape,"alpha"],Spacers.loc[shape,"beta"],1,Spacers.loc[shape,"d_h"],
+              h_c, l_f, A_m, L_m, Mpv] #values are alpha, beta, gamma, d_h, h_c, l_f, A_m, L_m, Mpv
           
 #%%#Plants and Objects#########################################################
 #Create Plants
 #Desal plants contain C_ROC (high), C_SW (low), Q_ROC(m^3/s),Optime,Elev
 #WW plants contain C_Eff (low), C_SW (high), Q_Eff (m^3/s),Optime,Elev
 #note: Tampa Bay Salinity is assumed to be 27 ppt
-TBdp = props.DesalPlant("Tampa Bay Desalination Plant",66,27,0.83,0.75,3.1) #66,27,0.83,0.6,3.1
+TBdp = props.DesalPlant("Tampa Bay Desalination Plant",66,27,0.83,0.80,3.1) #66,27,0.83,0.6,3.1
 HCww = props.WWPlant("Howard F. Curren Wastewater Plant",0.431,27,2.29,1,2.7)
 SCRA = props.WWPlant("South County Regional AWWTP",0.256,27,0.2,1,13.4)
 
@@ -67,6 +78,7 @@ SSWww = props.WWPlant("Seven Seas Water Wastewater Plant",0.01,27,2.29,1,2.7)
 
 #Create Turbines
 Pelton = props.TurbineType("Pelton Turbine", 0.85)
+Hydro = props.TurbineType("Hydro-Turbine", 0.90)
 RPE = props.TurbineType("Rotary Pressure Exchanger", 0.97)
 #Pump = props.PumpType("Pump", 0.75) #Value from "Hammer, M.J., Hammer, Jr., M.J., 2012. Water and Wastewater Technology, 7th ed. Pearson Education Inc., Upper Saddle River, NJ."
 
@@ -100,12 +112,12 @@ SCRA_TBdpi = props.Tr_use("Tampa Bay Desalination Plant","South County Regional 
 #dEP (change in Energy Price per year, $), r (interest rate)
 #see the payback period - will be acceptable if less than 7 years
 #Set maximum years for payback period to 30
-proj = [30,0.09,0.003,0.03]
+proj = [50,0.09,0.003,0.03]
 
 #%%#Plant Comparer#############################################################
 '''
-note: format is pse.combo(membs,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,\
-Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,A_m,L_m,Mpv,MW_NaCl
+note: format is pse.combo(membs,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,mu\
+Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl
 #PTopp: 0 - no pretreatment, 1 - Draw Pretreatment, 2 = Feed pretreatment, 3 = feed and draw pretreatment
 #Tropp = 1 = transmission, 0 = no transmission
 #Assume ROC and WW do not need pretreatment - place Pt['MF'] in as a default though to make code work
@@ -113,16 +125,32 @@ Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,A_m,L_m,Mpv,MW_NaCl
 #PV_rev and PV_net represent present value of revenue and net present value (revenue - cost) over given time-frame (first # in proj())
 '''
 #roc_ww = pse.combo(membs,RPE,HCww_TBdpi,TBdp.Q_ROC,TBdp.C_ROC,HCww.C_Eff,proj,TBdp.OpTime,Cms,T,\
-#                   1,Pt['MF'],Pt['MF'],C_Vant,0,inf,v,R,A_m,L_m,Mpv,MW_NaCl)
+#                   1,Pt['MF'],Pt['MF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
 
-roc_ww2 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,\
-                   1,Pt['MF'],Pt['MF'],C_Vant,0,inf,v,R,A_m,L_m,Mpv,MW_NaCl)
+#roc_ww2 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,mu,\
+#                   1,Pt['MF'],Pt['MF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
 
-sw_ww = pse.combo(membs,Pelton,HCww_TBdpi,HCww.Q_Eff,HCww.C_SW,HCww.C_Eff,proj,HCww.OpTime,Cms,T,\
-                   0,Pt['MF'],Pt['MF'],C_Vant,1,inf,v,R,A_m,L_m,Mpv,MW_NaCl)
+sw_ww = pse.combo(membs,Hydro,HCww_TBdpi,HCww.Q_Eff,HCww.C_SW,HCww.C_Eff,proj,HCww.OpTime,Cms,T,mu,\
+                   0,Pt['MF'],Pt['MF'],C_Vant,1,inf,v,R,M_geometry,MW_NaCl)
 
-roc_sw = pse.combo(membs,RPE,HCww_TBdpi,TBdp.Q_ROC,TBdp.C_ROC,TBdp.C_SW,proj,TBdp.OpTime,Cms,T,\
-                   0,Pt['MF'],Pt['MF'],C_Vant,2,inf,v,R,A_m,L_m,Mpv,MW_NaCl)
+roc_sw = pse.combo(membs,RPE,HCww_TBdpi,TBdp.Q_ROC,TBdp.C_ROC,TBdp.C_SW,proj,TBdp.OpTime,Cms,T,mu,\
+                   0,Pt['MF'],Pt['MF'],C_Vant,2,inf,v,R,M_geometry,MW_NaCl)
+
+#ROC-WW trial with Microfiltration enabled for WW side
+roc_ww3 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,mu,\
+                   1,Pt['MF'],Pt['MF'],C_Vant,2,inf,v,R,M_geometry,MW_NaCl)
+
+#ROC-WW trial with Ultrafiltration enabled for WW side
+roc_ww4 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,mu,\
+                   1,Pt['UF'],Pt['UF'],C_Vant,2,inf,v,R,M_geometry,MW_NaCl)
+
+#ROC-WW trial with hydroturbine
+roc_ww5 = pse.combo(membs,Hydro,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,mu,\
+                   1,Pt['UF'],Pt['UF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
+
+#ROC-WW trial with no transport 
+roc_ww6 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,12.23,T,mu,\
+                   0,Pt['UF'],Pt['UF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
 
 #mincost - based on unit cost
 #comp_mincost = pse.Compcg(sw_ww,roc_ww,roc_sw,'Cost_Unit($/kW)','min')
@@ -163,5 +191,6 @@ print(end - start) # Time in seconds
 #ScatmPlot: inputs are: dataset1,dataset2,dataset3,x,y,averager,spec,spec_inc, line, SysCon2_inc,interact,title
 #Note - interactive plot has title, non-interactive does not
 df4 = plotter.ScatmPlot(sw_ww,roc_ww2,roc_sw,'SE_net(kWh/m^3)','PV_net($)','Q_de(L/hr)',comp_mincost2,1,0,0,1,'Net Specific Energy vs Unit Net Present Value for each tested membrane')
+df5 = plotter.ScatmPlot(sw_ww,roc_ww2,roc_sw,'SE_net(kWh/m^3)','PV_net($)','Q_de(L/hr)',comp_mincost2,1,0,0,0,'Net Specific Energy vs Unit Net Present Value for each tested membrane')
 #compcpw = plotter.ScatmPlot(roc_sw,sw_ww,roc_ww,'SE_net(kWh/m^3)','n_protr','# of Process Trains vs Specific Energy Comparison for Tampa Bay')
 #Note, if the JSON -serializable error comes up for mpld3, see this fix by ceprio: https://github.com/mpld3/mpld3/issues/441

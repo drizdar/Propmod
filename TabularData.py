@@ -75,7 +75,7 @@ Pump_dat = {
     #cost curves cover entire pump station cost, based on $/horsepower
     #cost estimates are class 5 (+50%, -30%) - based on ENR CCI = 8889, Los Angeles California, (April, 2007)
     #Pump Efficiency values from "Hammer, M.J., Hammer, Jr., M.J., 2012. Water and Wastewater Technology, 7th ed. Pearson Education Inc., Upper Saddle River, NJ."
-    "Sub":props.PumpType("Sub","Submersible", 0.75, 16599, 0.695)
+    "Sub":props.PumpType("Sub","Submersible", 0.89, 16599, 0.695) #eff based on river water pump from loeb 2002 paper
     ,"Horiz":props.PumpType("Horiz","Horizontal", 0.75, 62040, 0.6128)
     ,"Vert":props.PumpType("Vert","Submersible", 0.75, 26238, 0.619)
     }
@@ -190,3 +190,19 @@ C_Vals = {
         'Concrete':130, #Hammer, 2012
         'Plastic':(140 + 150)/2, #Hammer, 2012   
         }
+
+#%%#Spacer Data############################################################
+Spacer_dat = {
+    #values are shape,alpha,beta,a_hc,a_b,shape_type (0 = circle, 1 = ellipse, 2 = square, 3 = wing)
+    #values from "Guillen, G., Hoek, E., 2009. Modeling the impacts of feed spacer geometry on reverse osmosis and nanofiltration processes. Chemical Engineering Journal."
+    #Table 3 in aforementioned reference
+    "1:3 ellipse":props.SpacerType("1:3 ellipse", 0.13, 128.24, 0.13, (1/3), 1)
+    ,"1:2 ellipse":props.SpacerType("1:2 ellipse", 0.17, 141.24, 0.17, 0.5, 1)
+    ,"1:3 wing":props.SpacerType("1:3 wing", 0.19, 135.56, 0.18, (1/3), 3)
+    ,"Square":props.SpacerType("Square", 0.42, 176.99, 0.20, 1, 2)
+    ,"1:2 wing":props.SpacerType("1:2 wing", 0.29, 152.16, 0.22, 0.5, 3)
+    ,"Circle":props.SpacerType("Circle", 0.42, 189.29, 0.25, 1, 0)
+    ,"1:1 wing":props.SpacerType("1:1 wing", 0.59, 190.96, 0.27, 1, 3)
+    ,"2:1 wing":props.SpacerType("2:1 wing", 0.91, 236.73, 0.30, 2, 3)
+    ,"2:1 ellipse":props.SpacerType("2:1 ellipse", 1.44, 315.63, 0.33, 2, 1)
+    }

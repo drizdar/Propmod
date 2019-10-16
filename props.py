@@ -8,6 +8,7 @@ for PRO. Really it's just a holding file for classes haha.
 @author: Drizdar
 """
 import pandas as pd
+import math
 
 #%%#Plants#####################################################################
 class DesalPlant:
@@ -200,8 +201,8 @@ class Tr_use:
       import pro_sys_eqns as pse
       Tr_use = pse.engeq(self.ks,self.D,self.rho,self.mu,self.z1,self.z2, \
                          self.L,self.g,self.Q,self.Pump,self.inf,self.kLtot) #kWh/m^3
-      Tr_use_dat = pd.Series([Tr_use[0],Tr_use[1],Tr_use[2],Tr_use[3],Tr_use[4],Tr_use[5],Tr_use[6],Tr_use[7]],
-                             index=['Tr_use(kWh/m^3)', 'Pump Head(m)', 'P(kW)', 'D(m)','V(m/s)','Pipe Cost($)','Pump Cost($)','Total Cost($)'])
+      Tr_use_dat = pd.Series([Tr_use[0],Tr_use[1],Tr_use[2],Tr_use[3],Tr_use[4],Tr_use[5],Tr_use[6],Tr_use[7],Tr_use[8],Tr_use[9]],
+                             index=['Tr_use(kWh/m^3)', 'Pump Head(m)', 'P(kW)', 'D(m)','V(m/s)','Pipe Cost($)','Pump Cost($)','Total Cost($)','a','n'])
       #s1 = pd.Series([1,2,3,4,5,6], index=pd.date_range('20130102', periods=6))
       return Tr_use_dat
    
@@ -209,3 +210,63 @@ class Tr_use:
       print("The", self.DesalPlant,  
             "and the",self.WWPlant,
             "are",self.L/1000,"kilometers apart.")
+
+##Spacers
+class SpacerType:
+    'common base class for different spacer geometries'
+    
+    def __init__(self,shape,alpha,beta,a_hc,a_b,shape_type):
+        self.shape = shape
+        self.alpha = alpha
+        self.beta = beta
+        self.a_hc = a_hc #a/h_c #ratio to calculate a based on h_c value
+        self.a_b = a_b #a/b - ratio to calculate b based on a value
+        self.shape_type = shape_type #(0 = circle, 1 = ellipse, 2 = wing, 3 = square)
+    
+    def displayStats(self):
+        print("Shape:", self.shape,
+              ", alpha:", self.alpha,
+              ", beta:", self.beta,
+              ", effective cross section:", self.a_hc,
+              ", a to b ratio:", self.a_b)
+    
+    def perimeter_calc(self, h_c):
+        #calculates filament perimeter
+        a = self.a_hc * h_c
+        b = a/self.a_b
+        if self.shape_type == 0: #circle
+            P_f = 2 * math.pi * a
+        elif self.shape_type == 1: #ellipse
+            P_f = math.pi*(3*(a+b) - math.sqrt((3*a + b)*(a + 3*b)))
+        elif self.shape_type == 2: #square
+            P_f = 8 * a
+        elif self.shape_type == 3: #wing
+            P_f = (math.pi * a) + (2 * math.sqrt(a**2 + b**2))
+        return P_f
+    
+    def cx_calc(self, h_c):
+        a = self.a_hc * h_c
+        b = a/self.a_b
+        if self.shape_type == 0: #circle
+            X_f = math.pi * (a**2)
+        elif self.shape_type == 1: #ellipse
+            X_f = math.pi * a * b
+        elif self.shape_type == 2: #square
+            X_f = (2*a)**2
+        elif self.shape_type == 3: #wing
+            X_f = (0.5 * math.pi * (a**2)) + ((a * b)/2)
+        return X_f
+        
+    def d_h_calc(self,h_c,l_f):
+        P_f = self.perimeter_calc(h_c) #filament perimeter
+        X_f = self.cx_calc(h_c) #filament cross-sectional area
+        d_h = (4*(l_f * h_c - X_f)) / (2*l_f + P_f)
+        return d_h
+    
+    def to_dict(self,h_c,l_f):
+       return {
+               'Shape': self.shape,
+               'alpha': self.alpha,
+               'beta': self.beta,
+               'd_h': self.d_h_calc(h_c,l_f)
+               }

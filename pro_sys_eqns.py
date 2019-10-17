@@ -273,7 +273,9 @@ def comboin(MemTyp,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,mu,Tropp,PT_d,PT_
     SE_PT = pt[0] #Energy Used by Pretreatment 
     C_d = (C_D * swden(C_D,T)) / MW_NaCl #mol/m^3
     C_f = (C_F * swden(C_F,T)) / MW_NaCl #mol/m^3
-    C_exit = sys_in[8] #ppt (mg/kg)
+    C_de = sys_in[8] #ppt (mg/kg)
+    C_fe = sys_in[7] #ppt (mg/kg)
+    C_me = (C_fe*Q_fe + C_de*Q_de)/(Q_fe+Q_de) #concentration of mixed effluent
     SE_max_rev = SEcalc(C_d,C_f,v,T,R,"rev") #kWh/m^3, Maximum Specific Energy for a Thermodynamically reversible process
     SE_max_CoCur = SEcalc(C_d,C_f,v,T,R,"CoCur") #kWh/m^3, Maximum Specific Energy for a Co-current circulatory process
     SE_max_CntCur = SEcalc(C_d,C_f,v,T,R,"CntCur") #kWh/m^3, Maximum Specific Energy for a Counter-current circulatory process
@@ -342,11 +344,11 @@ def comboin(MemTyp,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,mu,Tropp,PT_d,PT_
     #Ineff_E = SE_gross * (1-W_n)
     #Ineff_W = (Ineff_E*Q_feed)/1e6
     #PT_W = (PT_use*Q_feed)/1e6
-    return sys_in[9],sys_in[11],sys_in[4],sys_in[10],sys_in[13],A_t,n_pv,n_protr,C_exit,Q_di,Q_fi,Q_de,Q_fe,SE_max_rev,SE_max_CoCur,SE_max_CntCur,SE_gross,SE_net,MW_gross,Circ,MW_net,E_net,\
+    return sys_in[9],sys_in[11],sys_in[4],sys_in[10],sys_in[13],A_t,n_pv,n_protr,C_de,C_fe,C_me,Q_di,Q_fi,Q_de,Q_fe,SE_max_rev,SE_max_CoCur,SE_max_CntCur,SE_gross,SE_net,MW_gross,Circ,MW_net,E_net,\
             Cost_Memb,Cost_Tr,Cost_Turb,Cost_PT,Cost_Cons,Cost,Cost_Unit,Cost_OM,Cost_OM_Unit,Cost_OM_Unit2,PV_rev,PV_net,PB_pd,SE_Ineff,SE_PT,SE_Tr,MW_Ineff,MW_PT,MW_Tr,SysCon, SysCon2
 
 def combo(membs,TurbTyp,Tr_usei,Q,C_D,C_F,proj,OpTime,Cms,T,mu,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl):
-    p = pd.Categorical(['J_w(L m-2 h-1)','J_s(g L m-2 h-1 kg-1)','W(W m-2)','dPi(bar)','dPe(bar)','A_t(m^2)','n_pv','n_protr','C_exit(ppt)','Q_di(L/hr)','Q_fi(L/hr)','Q_de(L/hr)','Q_fe(L/hr)',\
+    p = pd.Categorical(['J_w(L m-2 h-1)','J_s(g L m-2 h-1 kg-1)','W(W m-2)','dPi(bar)','dPe(bar)','A_t(m^2)','n_pv','n_protr','C_de(ppt)','C_fe(ppt)','C_me(ppt)','Q_di(L/hr)','Q_fi(L/hr)','Q_de(L/hr)','Q_fe(L/hr)',\
             'SE_max_rev(kWh/m^3)','SE_max_CoCur(kWh/m^3)','SE_max_CntCur(kWh/m^3)','SE_gross(kWh/m^3)','SE_net(kWh/m^3)',\
             'MW_gross(MW)','Circ','MW_net(MW)','E_net(MWh/yr)','Cost_Memb($)','Cost_Tr($)','Cost_Turb($)','Cost_PT($)','Cost_Cons($)','Cost($)',\
             'Cost_Unit($/kW)','Cost_OM($/Yr)','Cost_OM_Unit($/kw-yr)','Cost_OM_Unit2($/kwh)','PV_rev($)','PV_net($)','PB_pd(Yrs)','SE_Ineff(kWh/m^3)','SE_PT(kWh/m^3)','SE_Tr(kWh/m^3)','MW_Ineff(MW)','MW_PT(MW)','MW_Tr(MW)','SysCon','SysCon2'])
@@ -419,7 +421,7 @@ def comboUSA(prob,N_Yrs,Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,g,MW_NaC
     Pmp = td.Pump_dat
     
     #P is same as P for normal analysis --> whenever edit is made to other P, edit this one too
-    p = pd.Categorical(['J_w(L m-2 h-1)','J_s(g L m-2 h-1 kg-1)','W(W m-2)','dPi(bar)','dPe(bar)','A_t(m^2)','n_pv','n_protr','C_exit(ppt)','Q_di(L/hr)','Q_fi(L/hr)','Q_de(L/hr)','Q_fe(L/hr)',\
+    p = pd.Categorical(['J_w(L m-2 h-1)','J_s(g L m-2 h-1 kg-1)','W(W m-2)','dPi(bar)','dPe(bar)','A_t(m^2)','n_pv','n_protr','C_de(ppt)','C_fe(ppt)','C_me(ppt)','Q_di(L/hr)','Q_fi(L/hr)','Q_de(L/hr)','Q_fe(L/hr)',\
             'SE_max_rev(kWh/m^3)','SE_max_CoCur(kWh/m^3)','SE_max_CntCur(kWh/m^3)','SE_gross(kWh/m^3)','SE_net(kWh/m^3)',\
             'MW_gross(MW)','Circ','MW_net(MW)','E_net(MWh/yr)','Cost_Memb($)','Cost_Tr($)','Cost_Turb($)','Cost_PT($)','Cost_Cons($)','Cost($)',\
             'Cost_Unit($/kW)','Cost_OM($/Yr)','Cost_OM_Unit($/kw-yr)','Cost_OM_Unit2($/kwh)','PV_rev($)','PV_net($)','PB_pd(Yrs)','SE_Ineff(kWh/m^3)','SE_PT(kWh/m^3)','SE_Tr(kWh/m^3)','MW_Ineff(MW)','MW_PT(MW)','MW_Tr(MW)','SysCon','SysCon2'])

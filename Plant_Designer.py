@@ -124,11 +124,13 @@ Tropp,PT_d,PT_f,C_Vant,PTopp,inf,v,R,M_geometry,MW_NaCl
 #note: multiply Tr_use by 0 if no transmission necessary
 #PV_rev and PV_net represent present value of revenue and net present value (revenue - cost) over given time-frame (first # in proj())
 '''
-#roc_ww = pse.combo(membs,RPE,HCww_TBdpi,TBdp.Q_ROC,TBdp.C_ROC,HCww.C_Eff,proj,TBdp.OpTime,Cms,T,\
+#ROC-WW using the HCww as the WW Plant
+#roc_ww = pse.combo(membs,RPE,HCww_TBdpi,TBdp.Q_ROC,TBdp.C_ROC,HCww.C_Eff,proj,TBdp.OpTime,Cms,T,mu,\
 #                   1,Pt['MF'],Pt['MF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
 
-#roc_ww2 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,mu,\
-#                   1,Pt['MF'],Pt['MF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
+#ROC-WW trial using SCRA as the WW Plant
+roc_ww2 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,mu,\
+                   1,Pt['MF'],Pt['MF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
 
 sw_ww = pse.combo(membs,Hydro,HCww_TBdpi,HCww.Q_Eff,HCww.C_SW,HCww.C_Eff,proj,HCww.OpTime,Cms,T,mu,\
                    0,Pt['MF'],Pt['MF'],C_Vant,1,inf,v,R,M_geometry,MW_NaCl)
@@ -137,20 +139,20 @@ roc_sw = pse.combo(membs,RPE,HCww_TBdpi,TBdp.Q_ROC,TBdp.C_ROC,TBdp.C_SW,proj,TBd
                    0,Pt['MF'],Pt['MF'],C_Vant,2,inf,v,R,M_geometry,MW_NaCl)
 
 #ROC-WW trial with Microfiltration enabled for WW side
-roc_ww3 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,mu,\
-                   1,Pt['MF'],Pt['MF'],C_Vant,2,inf,v,R,M_geometry,MW_NaCl)
+#roc_ww3 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,mu,\
+#                  1,Pt['MF'],Pt['MF'],C_Vant,2,inf,v,R,M_geometry,MW_NaCl)
 
 #ROC-WW trial with Ultrafiltration enabled for WW side
-roc_ww4 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,mu,\
-                   1,Pt['UF'],Pt['UF'],C_Vant,2,inf,v,R,M_geometry,MW_NaCl)
+#roc_ww4 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,mu,\
+#                   1,Pt['UF'],Pt['UF'],C_Vant,2,inf,v,R,M_geometry,MW_NaCl)
 
 #ROC-WW trial with hydroturbine
-roc_ww5 = pse.combo(membs,Hydro,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,mu,\
-                   1,Pt['UF'],Pt['UF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
+#roc_ww5 = pse.combo(membs,Hydro,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,Cms,T,mu,\
+#                   1,Pt['UF'],Pt['UF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
 
 #ROC-WW trial with no transport 
-roc_ww6 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,12.23,T,mu,\
-                   0,Pt['UF'],Pt['UF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
+#roc_ww6 = pse.combo(membs,RPE,SCRA_TBdpi,SCRA.Q_Eff*1.4,TBdp.C_ROC,SCRA.C_Eff,proj,TBdp.OpTime,12.23,T,mu,\
+#                   0,Pt['UF'],Pt['UF'],C_Vant,0,inf,v,R,M_geometry,MW_NaCl)
 
 #mincost - based on unit cost
 #comp_mincost = pse.Compcg(sw_ww,roc_ww,roc_sw,'Cost_Unit($/kW)','min')
@@ -190,7 +192,7 @@ print(end - start) # Time in seconds
 
 #ScatmPlot: inputs are: dataset1,dataset2,dataset3,x,y,averager,spec,spec_inc, line, SysCon2_inc,interact,title
 #Note - interactive plot has title, non-interactive does not
-df4 = plotter.ScatmPlot(sw_ww,roc_ww2,roc_sw,'SE_net(kWh/m^3)','PV_net($)','Q_de(L/hr)',comp_mincost2,1,0,0,1,'Net Specific Energy vs Unit Net Present Value for each tested membrane')
-df5 = plotter.ScatmPlot(sw_ww,roc_ww2,roc_sw,'SE_net(kWh/m^3)','PV_net($)','Q_de(L/hr)',comp_mincost2,1,0,0,0,'Net Specific Energy vs Unit Net Present Value for each tested membrane')
+df4 = plotter.ScatmPlot(sw_ww,roc_ww2,roc_sw,'SE_net(kWh/m^3)','PV_net($)','Q_de(L/hr)',comp_mincost2,1,0,0,0,'Net Specific Energy vs Unit Net Present Value for each tested membrane')
+#df5 = plotter.ScatmPlot(sw_ww,roc_ww2,roc_sw,'SE_net(kWh/m^3)','PV_net($)','Q_de(L/hr)',comp_mincost2,1,0,0,1,'Net Specific Energy vs Unit Net Present Value for each tested membrane')
 #compcpw = plotter.ScatmPlot(roc_sw,sw_ww,roc_ww,'SE_net(kWh/m^3)','n_protr','# of Process Trains vs Specific Energy Comparison for Tampa Bay')
 #Note, if the JSON -serializable error comes up for mpld3, see this fix by ceprio: https://github.com/mpld3/mpld3/issues/441

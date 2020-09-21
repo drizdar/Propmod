@@ -1,0 +1,302 @@
+{
+    "A_09_1": {
+        "name": "Achilli, 2009 - #1",
+        "A": 0.673,
+        "B": 0.4,
+        "D": 5.299e-06,
+        "k": 303.5,
+        "S": 0.000707,
+        "material": "CTA",
+        "reference": "Achilli, A., Cath, T.Y., Childress, A.E., 2009. Power generation with pressure retarded osmosis: An experimental and theoretical investigation. Journal of membrane science."
+    },
+    "A_09_2": {
+        "name": "Achilli, 2009 - #2",
+        "A": 0.673,
+        "B": 0.4,
+        "D": 5.364e-06,
+        "k": 305.3,
+        "S": 0.000682,
+        "material": "CTA",
+        "reference": "Achilli, A., Cath, T.Y., Childress, A.E., 2009. Power generation with pressure retarded osmosis: An experimental and theoretical investigation. Journal of membrane science."
+    },
+    "A_09_3": {
+        "name": "Achilli, 2009 - #3",
+        "A": 0.673,
+        "B": 0.4,
+        "D": 5.602e-06,
+        "k": 311.8,
+        "S": 0.000646,
+        "material": "CTA",
+        "reference": "Achilli, A., Cath, T.Y., Childress, A.E., 2009. Power generation with pressure retarded osmosis: An experimental and theoretical investigation. Journal of membrane science."
+    },
+    "A_14_1": {
+        "name": "Achilli, 2014",
+        "A": 5.11,
+        "B": 0.09,
+        "D": 5.328e-06,
+        "k": 99,
+        "S": 0.00031,
+        "material": "TFC",
+        "reference": "Achilli, A., Prante, J.L., Hancock, N.T., Maxwell, E.B., Childress, A.E., 2014. Experimental results from RO-PRO: a next generation system for low-energy desalination. Environ. Sci. Technol. 48, 6437-43."
+    },
+    "A_16_1": {
+        "name": "Altaee, 2016",
+        "A": 0.67,
+        "B": 0.4,
+        "D": 6.25e-06,
+        "k": 306,
+        "S": 0.0008,
+        "material": "CTA",
+        "reference": "Altaee, A., Millar, G., Zaragoza, G., 2016. Integration and optimization of pressure retarded osmosis with reverse osmosis for power generation and high efficiency desalination. Energy 103, 110-118."
+    },
+    "C_10_1": {
+        "name": "Chou, 2010 - FO-#C-TFC",
+        "A": 3.5,
+        "B": 0.22,
+        "D": 5.796e-06,
+        "k": 10.54,
+        "S": 0.00055,
+        "material": "TFC",
+        "reference": "Chou, S., Shi, L., Wang, R., Tang, C., Qiu, C., Fane, A., 2010. Characteristics and potential applications of a novel forward osmosis hollow fiber membrane. Desalination 261, 365-372."
+    },
+    "C_12_1": {
+        "name": "Chou, 2012 - PRO-TFC-PES",
+        "A": 3.32,
+        "B": 0.14,
+        "D": 5.328e-06,
+        "k": 12.2,
+        "S": 0.00046,
+        "material": "TFC",
+        "reference": "Chou, S., Wang, R., Shi, L., She, Q., Tang, C., Fane, A., 2012. Thin-film composite hollow fiber membranes for pressure retarded osmosis (PRO) process with high power density. J Membrane Sci 389, 25-33."
+    },
+    "C_13_1": {
+        "name": "Chou, 2013 - PRO-TFC-PEI",
+        "A": 1.52,
+        "B": 0.24,
+        "D": 5.328e-06,
+        "k": 8.73,
+        "S": 0.00061,
+        "material": "TFC",
+        "reference": "Chou, S., Wang, R., Fane, A., 2013. Robust and High performance hollow fiber membranes for energy harvesting from salinity gradients by pressure retarded osmosis. Journal of Membrane Science 448, 44-54."
+    },
+    "G_06_1": {
+        "name": "Gray, 2006 - HTI",
+        "A": 1.13,
+        "B": 0.46,
+        "D": 5.796e-06,
+        "k": 10.08,
+        "S": 0.000575,
+        "material": "CTA",
+        "reference": "Gray, G., McCutcheon, J., Elimelech, M., 2006. Internal concentration polarization in forward osmosis: role of membrane orientation. Desalination 197, 1-8."
+    },
+    "H_13_1": {
+        "name": "Han, 2013 - TFC-HF1",
+        "A": 1.4,
+        "B": 0.13,
+        "D": 5.21e-06,
+        "k": 76.7,
+        "S": 0.000987,
+        "material": "TFC",
+        "reference": "Han, G., Wang, P., Chung, T.-S., 2013. Highly Robust Thin-Film Composite Pressure Retarded Osmosis (PRO) Hollow Fiber Membranes with High Power Densities for Renewable Salinity-Gradient Energy Generation. Environ Sci Technology 47, 8070-8077."
+    },
+    "H_13_2": {
+        "name": "Han, 2013 - TFC-HF2",
+        "A": 1.7,
+        "B": 0.41,
+        "D": 5.321e-06,
+        "k": 76.7,
+        "S": 0.000745,
+        "material": "TFC",
+        "reference": "Han, G., Wang, P., Chung, T.-S., 2013. Highly Robust Thin-Film Composite Pressure Retarded Osmosis (PRO) Hollow Fiber Membranes with High Power Densities for Renewable Salinity-Gradient Energy Generation. Environ Sci Technology 47, 8070-8077."
+    },
+    "H_13_3": {
+        "name": "Han, 2013 - TFC-HF3",
+        "A": 1.9,
+        "B": 0.48,
+        "D": 5.331e-06,
+        "k": 76.7,
+        "S": 0.000776,
+        "material": "TFC",
+        "reference": "Han, G., Wang, P., Chung, T.-S., 2013. Highly Robust Thin-Film Composite Pressure Retarded Osmosis (PRO) Hollow Fiber Membranes with High Power Densities for Renewable Salinity-Gradient Energy Generation. Environ Sci Technology 47, 8070-8077."
+    },
+    "S_12_1": {
+        "name": "She, 2012 - CTA-P",
+        "A": 0.749,
+        "B": 0.63,
+        "D": 5.796e-06,
+        "k": 12.06,
+        "S": 0.00048,
+        "material": "CTA",
+        "reference": "She, Q., Jin, X., Tang, C., 2012. Osmotic power production from salinity gradient resource by pressure retarded osmosis: Effects of operating conditions and reverse solute diffusion. J Membrane Sci 401, 262-273."
+    },
+    "S_12_2": {
+        "name": "She, 2012 - CTA-NW",
+        "A": 0.436,
+        "B": 0.07,
+        "D": 5.796e-06,
+        "k": 4.21,
+        "S": 0.00138,
+        "material": "CTA",
+        "reference": "She, Q., Jin, X., Tang, C., 2012. Osmotic power production from salinity gradient resource by pressure retarded osmosis: Effects of operating conditions and reverse solute diffusion. J Membrane Sci 401, 262-273."
+    },
+    "S_12_3": {
+        "name": "She, 2012 - CTA-W",
+        "A": 0.367,
+        "B": 0.28,
+        "D": 5.796e-06,
+        "k": 9.83,
+        "S": 0.00059,
+        "material": "CTA",
+        "reference": "She, Q., Jin, X., Tang, C., 2012. Osmotic power production from salinity gradient resource by pressure retarded osmosis: Effects of operating conditions and reverse solute diffusion. J Membrane Sci 401, 262-273."
+    },
+    "S_13_1": {
+        "name": "Song, 2013 - TNC-1",
+        "A": 1.23,
+        "B": 0.28,
+        "D": 5.328e-06,
+        "k": 76.7,
+        "S": 0.000149,
+        "material": "TFC",
+        "reference": "Song, X., Liu, Z., Sun, D., 2013. Energy recovery from concentrated seawater brine by thin-film nanofiber composite pressure retarded osmosis membranes with high power density. Energy Environ Sci 6, 1199-1210."
+    },
+    "S_13_2": {
+        "name": "Song, 2013 - TNC-2",
+        "A": 3.82,
+        "B": 1.19,
+        "D": 5.328e-06,
+        "k": 76.7,
+        "S": 0.000135,
+        "material": "TFC",
+        "reference": "Song, X., Liu, Z., Sun, D., 2013. Energy recovery from concentrated seawater brine by thin-film nanofiber composite pressure retarded osmosis membranes with high power density. Energy Environ Sci 6, 1199-1210."
+    },
+    "S_13_3": {
+        "name": "Song, 2013 - TNC-3",
+        "A": 5.31,
+        "B": 3.86,
+        "D": 5.328e-06,
+        "k": 76.7,
+        "S": 0.00014,
+        "material": "TFC",
+        "reference": "Song, X., Liu, Z., Sun, D., 2013. Energy recovery from concentrated seawater brine by thin-film nanofiber composite pressure retarded osmosis membranes with high power density. Energy Environ Sci 6, 1199-1210."
+    },
+    "S_14_1": {
+        "name": "Straub, 2014",
+        "A": 2.49,
+        "B": 0.39,
+        "D": 5.328e-06,
+        "k": 99,
+        "S": 0.000564,
+        "material": "TFC",
+        "reference": "Straub, A., Yip, N., Elimelech, M., 2014. Raising the Bar: Increased Hydraulic Pressure Allows Unprecedented High Power Densities in Pressure-Retarded Osmosis. Environ Sci Technology Lett 1, 55-59."
+    },
+    "W_10_1": {
+        "name": "Wang, 2010 - FO-#A-TFC",
+        "A": 0.94,
+        "B": 0.29,
+        "D": 5.796e-06,
+        "k": 3.96,
+        "S": 0.00137,
+        "material": "TFC",
+        "reference": "Wang, R., Shi, L., Tang, C., Chou, S., Qiu, C., Fane, A., 2010. Characterization of novel forward osmosis hollow fiber membranes. J Membrane Sci 355, 158-167."
+    },
+    "W_10_2": {
+        "name": "Wang, 2010 - FO-#B-TFC",
+        "A": 2.23,
+        "B": 0.2,
+        "D": 5.796e-06,
+        "k": 9.0,
+        "S": 0.000595,
+        "material": "TFC",
+        "reference": "Wang, R., Shi, L., Tang, C., Chou, S., Qiu, C., Fane, A., 2010. Characterization of novel forward osmosis hollow fiber membranes. J Membrane Sci 355, 158-167."
+    },
+    "Y_11_1": {
+        "name": "Yip, 2011 - LP#1",
+        "A": 1.74,
+        "B": 0.16,
+        "D": 5.364e-06,
+        "k": 138.6,
+        "S": 0.000307,
+        "material": "TFC",
+        "reference": "Yip, N.Y., Tiraferri, A., Phillip, W.A., Schiffman, J.D., Hoover, L.A., Kim, Y.C., Elimelech, M., 2011. Thin-film composite pressure retarded osmosis membranes for sustainable power generation from salinity gradients. Environ. Sci. Technol. 45, 4360-9."
+    },
+    "Y_11_2": {
+        "name": "Yip, 2011 - LP#2",
+        "A": 1.42,
+        "B": 0.08,
+        "D": 5.364e-06,
+        "k": 138.6,
+        "S": 0.000355,
+        "material": "TFC",
+        "reference": "Yip, N.Y., Tiraferri, A., Phillip, W.A., Schiffman, J.D., Hoover, L.A., Kim, Y.C., Elimelech, M., 2011. Thin-film composite pressure retarded osmosis membranes for sustainable power generation from salinity gradients. Environ. Sci. Technol. 45, 4360-9."
+    },
+    "Y_11_3": {
+        "name": "Yip, 2011 - LP#3",
+        "A": 1.71,
+        "B": 0.09,
+        "D": 5.364e-06,
+        "k": 138.6,
+        "S": 0.000384,
+        "material": "TFC",
+        "reference": "Yip, N.Y., Tiraferri, A., Phillip, W.A., Schiffman, J.D., Hoover, L.A., Kim, Y.C., Elimelech, M., 2011. Thin-film composite pressure retarded osmosis membranes for sustainable power generation from salinity gradients. Environ. Sci. Technol. 45, 4360-9."
+    },
+    "Y_11_4": {
+        "name": "Yip, 2011 - MP#1",
+        "A": 5.81,
+        "B": 0.88,
+        "D": 5.364e-06,
+        "k": 138.6,
+        "S": 0.00037,
+        "material": "TFC",
+        "reference": "Yip, N.Y., Tiraferri, A., Phillip, W.A., Schiffman, J.D., Hoover, L.A., Kim, Y.C., Elimelech, M., 2011. Thin-film composite pressure retarded osmosis membranes for sustainable power generation from salinity gradients. Environ. Sci. Technol. 45, 4360-9."
+    },
+    "Y_11_5": {
+        "name": "Yip, 2011 - MP#2",
+        "A": 4.08,
+        "B": 0.77,
+        "D": 5.364e-06,
+        "k": 138.6,
+        "S": 0.000332,
+        "material": "TFC",
+        "reference": "Yip, N.Y., Tiraferri, A., Phillip, W.A., Schiffman, J.D., Hoover, L.A., Kim, Y.C., Elimelech, M., 2011. Thin-film composite pressure retarded osmosis membranes for sustainable power generation from salinity gradients. Environ. Sci. Technol. 45, 4360-9."
+    },
+    "Y_11_6": {
+        "name": "Yip, 2011 - MP#3",
+        "A": 3.16,
+        "B": 0.61,
+        "D": 5.364e-06,
+        "k": 138.6,
+        "S": 0.000316,
+        "material": "TFC",
+        "reference": "Yip, N.Y., Tiraferri, A., Phillip, W.A., Schiffman, J.D., Hoover, L.A., Kim, Y.C., Elimelech, M., 2011. Thin-film composite pressure retarded osmosis membranes for sustainable power generation from salinity gradients. Environ. Sci. Technol. 45, 4360-9."
+    },
+    "Y_11_7": {
+        "name": "Yip, 2011 - HP#1",
+        "A": 7.55,
+        "B": 5.45,
+        "D": 5.364e-06,
+        "k": 138.6,
+        "S": 0.000327,
+        "material": "TFC",
+        "reference": "Yip, N.Y., Tiraferri, A., Phillip, W.A., Schiffman, J.D., Hoover, L.A., Kim, Y.C., Elimelech, M., 2011. Thin-film composite pressure retarded osmosis membranes for sustainable power generation from salinity gradients. Environ. Sci. Technol. 45, 4360-9."
+    },
+    "Y_11_8": {
+        "name": "Yip, 2011 - HP#2",
+        "A": 7.35,
+        "B": 4.12,
+        "D": 5.364e-06,
+        "k": 138.6,
+        "S": 0.000336,
+        "material": "TFC",
+        "reference": "Yip, N.Y., Tiraferri, A., Phillip, W.A., Schiffman, J.D., Hoover, L.A., Kim, Y.C., Elimelech, M., 2011. Thin-film composite pressure retarded osmosis membranes for sustainable power generation from salinity gradients. Environ. Sci. Technol. 45, 4360-9."
+    },
+    "Y_11_9": {
+        "name": "Yip, 2011 - HP#3",
+        "A": 7.76,
+        "B": 3.86,
+        "D": 5.364e-06,
+        "k": 138.6,
+        "S": 0.000416,
+        "material": "TFC",
+        "reference": "Yip, N.Y., Tiraferri, A., Phillip, W.A., Schiffman, J.D., Hoover, L.A., Kim, Y.C., Elimelech, M., 2011. Thin-film composite pressure retarded osmosis membranes for sustainable power generation from salinity gradients. Environ. Sci. Technol. 45, 4360-9."
+    }
+}

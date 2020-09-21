@@ -1,0 +1,44 @@
+[
+    {
+        "stages": [
+            {
+                "membrane": {
+                    "id": "A_09_1",
+                    "dimensions": {
+                        "length": 1.016,
+                        "active_area": 4.18,
+                        "channel_height": 0.0007,
+                        "length_between_spacers": 0.0045,
+                        "spacer_geometry": "Circle"
+                    }
+                },
+                "pressure_vessel": {
+                    "membranes": 7
+                },
+                "skid": {
+                    "pressure_vessels": 27
+                }
+            }
+        ],
+        "feed": {
+            "flow": 12000,
+            "concentration": 0.256,
+            "temperature": 31.6
+        },
+        "draw": {
+            "flow": 12000,
+            "concentration": 66,
+            "temperature": 31.6
+        },
+        "settings": {
+            "density_using_concentration": true,
+            "osmotic_potential": "Van Hoff",
+            "pressure_drop_due_to_spacer": true,
+            "flow_direction": "concurrent"
+        },
+        "last_run": null,
+        "file_name": "test",
+        "user": "B.H.",
+        "comments": null
+    }
+]

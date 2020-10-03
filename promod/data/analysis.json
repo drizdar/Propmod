@@ -3,38 +3,49 @@
         "stages": [
             {
                 "membrane": {
-                    "id": "A_09_1",
+                    "id": "S_14_1",
                     "dimensions": {
                         "length": 1.016,
-                        "active_area": 4.18,
+                        "active_area": 40.08,
                         "channel_height": 0.0007,
                         "length_between_spacers": 0.0045,
                         "spacer_geometry": "Circle"
                     }
                 },
                 "pressure_vessel": {
-                    "membranes": 7
+                    "membranes": 1,
+                    "flow_direction": "concurrent"
                 },
                 "skid": {
-                    "pressure_vessels": 27
+                    "pressure_vessels": 1
+                },
+                "stage": {
+                    "skids": 500,
+                    "mode": "PRO"
                 }
             }
         ],
         "feed": {
-            "flow": 12000,
-            "concentration": 0.256,
-            "temperature": 31.6
+            "flow": 1000,
+            "concentration": 0.6,
+            "temperature": 25
         },
         "draw": {
-            "flow": 12000,
-            "concentration": 66,
-            "temperature": 31.6
+            "flow": 350,
+            "concentration": 3.6,
+            "temperature": 25
         },
         "settings": {
-            "density_using_concentration": true,
+            "density_using_concentration": false,
             "osmotic_potential": "Van Hoff",
-            "pressure_drop_due_to_spacer": true,
-            "flow_direction": "concurrent"
+            "number_of_ions": 2,
+            "pressure_drop_due_to_spacer": false
+        },
+        "units": {
+            "flow": "L/s",
+            "concentration": "Mol/L",
+            "temperature": "K",
+            "length": "m"
         },
         "last_run": null,
         "file_name": "test",

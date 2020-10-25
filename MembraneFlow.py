@@ -84,31 +84,37 @@ print(Cf.max())
 PDens = dP*1e5*Jw_avg/60/60/1000
 
 print(f'Power density PD = {PDens}')
-levels = MaxNLocator(nbins=50).tick_values(Jw.min(), Jw.max())
 
 
-# pick the desired colormap, sensible levels, and define a normalization
+
+# levels = MaxNLocator(nbins=50).tick_values(Jw.min(), Jw.max())
 # instance which takes data values and translates those into levels.
-cmap = plt.get_cmap('rainbow')
-norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
+# cmap = plt.get_cmap('rainbow')
+# norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
 
-fig, (ax0, ax1) = plt.subplots(nrows=2)
-x = np.linspace(0, Ld, ned+1)
-y = np.linspace(Lf, 0, nef+1)
-im = ax0.pcolormesh(x, y, Jw, cmap=cmap, norm=norm)
-fig.colorbar(im, ax=ax0)
-ax0.set_title('pcolormesh with levels')
+# fig, (ax0, ax1) = plt.subplots(nrows=2)
+# im = ax0.pcolormesh(x, y, Jw, cmap=cmap, norm=norm)
+# fig.colorbar(im, ax=ax0)
+# ax0.set_title('pcolormesh with levels')
 
 
-# contours are *point* based plots, so convert our bound into point
-# centers
-cf = ax1.contourf(x[:-1] + dLd/2., y[:-1] + dLf/2., Jw, levels=levels, cmap=cmap)
-fig.colorbar(cf, ax=ax1)
-ax1.set_title('contourf with levels')
+# # contours are *point* based plots, so convert our bound into point
+# # centers
+# # cf = ax1.contourf(x[:-1] + dLd/2., y[:-1] + dLf/2., Jw, levels=levels, cmap=cmap)
 
-# adjust spacing between subplots so `ax1` title and `ax0` tick labels
-# don't overlap
-fig.tight_layout()
+# fig = plt.figure(figsize=(4,6),tight_layout=True)
+# ax = fig.add_axes([0.1,0.1,0.8,0.8])
+# cf = ax.contour(x, y, Jw, colors='black')
+# ax.clabel(cf, inline=True, fontsize=6)
 
-# plt.savefig('test.png')
+
+x = np.linspace(dLd/2, Ld-dLd/2, ned)
+y = np.linspace(Lf-dLf/2, dLf/2, nef)
+plt.figure()
+cp = plt.contour(x[:], y[:], Jw, colors='black')
+plt.clabel(cp, inline=True, fontsize=6)
+plt.title(r'Flux on membrane surface $(L\ h^{-1}\ m^{-2})$')
+plt.xlabel(r'Draw position $(m)$')
+plt.ylabel(r'Feed position $(m)$')
 plt.show()
+# plt.savefig('test.png')

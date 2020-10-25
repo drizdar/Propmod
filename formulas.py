@@ -55,3 +55,21 @@ def BPD(Pi, Vi, Vf, Di, Df):
     #Pressure drop using Bernoulli's equation assuming density is equal
     Pf = Pi + (0.5*Vi**2*Di - 0.5*Vf**2*Df)/1e5 #Velocity component from Pa to bar
     return Pf
+def RelativeDiffusivity(T,P):
+    U1 = 3.4279E2
+    U2 = -5.0866E-3
+    U3 = 9.4690E-7
+    U4 = -2.0525
+    U5 = 3.1159E3
+    U6 = -1.8289E2
+    U7 = -8.0325E3
+    U8 = 4.2142E6
+    U9 = 2.1417
+    C = U4 + U5/(U6 + T)
+    B = U7 + U8/T + U9*T
+    D1000 = U1*math.exp(U2*T + U3*T**2)
+    try:
+        D = D1000 + C*math.log((B + P)/(B + 1000))
+    except:
+        D = 0
+    return D

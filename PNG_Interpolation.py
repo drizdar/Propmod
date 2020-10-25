@@ -1,3 +1,5 @@
+import json
+from json import JSONEncoder
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -33,6 +35,11 @@ for i in range(0, len(raw_data)):
     calc_data[i][1] = y
 print(calc_data)
 
-fig = plt.figure()
-plt.plot(calc_data[:,0], calc_data[:,1])
-plt.show()
+# fig = plt.figure()
+# plt.plot(calc_data[:,0], calc_data[:,1])
+# plt.show()
+
+print(calc_data.tolist())
+f = open('diffusivity.json','w')
+f.write(json.dumps(calc_data.tolist()))
+f.close()

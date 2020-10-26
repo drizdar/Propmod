@@ -73,3 +73,17 @@ def RelativeDiffusivity(T,P):
     except:
         D = 0
     return D
+def Alpha_Phi(D,T): #Debye-Hückel slope for the osmotic coefficient 
+    NA = 6.022045E23
+    PI = math.pi
+    pw = 1
+    k = 1.38066E-16 #erg K-1
+    # k = 1.3806049E-16 #erg K-1
+    e = 4.803242E-10 #esu 1/2997924580 C
+    A_phi = 1/3*(2*PI*NA*pw/1000)**(1/2)*(e**2/(D*k*T))**(3/2)
+    return A_phi
+def IonicStrength(Ions):
+    I = 0
+    for i in range(0, len(Ions)):
+        I += 0.5*Ions[i]['molality']*math.pow(Ions[i]['charge'],2)
+    return I

@@ -1,22 +1,18 @@
 import math
+from formulas import IonicStrength
 #Ionic Strength
-pc_wt = 25
-M_NaCl = 58.44277 #g/mol
-Mo_s = pc_wt/100/(M_NaCl/1000)
-MoNa = Mo_s #mol
-MoCl = Mo_s #mol
+pc_wt = 0.25
+m_total = 1 + pc_wt #kg
+MM_NaCl = 58.44277 #g/mol
+moNaCl = pc_wt/(MM_NaCl/1000)
+moNa = moNaCl #mol
+moCl = moNaCl #mol
 zNa = 1 #e
 zCl = -1 #e
-def IonicStrength(Ions):
-    I = 0
-    for i in range(0, len(Ions)):
-        I += 0.5*Ions[i]['molality']*math.pow(Ions[i]['charge'],2)
-    return I
 Ions = [
-    {'molality': MoNa, 'charge': zNa},
-    {'molality': MoCl, 'charge': zCl}
+    {'molality': moNa, 'charge': zNa},
+    {'molality': moCl, 'charge': zCl}
 ]
-I1 = 0.5*(MoNa*zNa**2 + MoCl*zCl**2)
-I2 = IonicStrength(Ions)
-print(I1,I2)
-print(f'Iconic Strength I = {I1}')
+I = IonicStrength(Ions)
+assert I == 4.277689096529818, 'Ionic Strength does not match expected'
+print(f'Iconic Strength I = {I}')

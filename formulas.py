@@ -4,7 +4,15 @@ import math
 # Constants
 R = 0.0831446261815324  # L-bar/mol-K
 n = 2  # number of ions for Van Hoff's equation
-NaCl = 58.44277  # g/mol
+MM_NaCl = 58.44277  # g/mol
+MM_W = 18.01528  # g/mol
+v = 2  # dissociation constant for NaCl
+vm = 1  # cations
+vx = 1  # anions
+zm = 1  # e
+zx = -1  # e
+b = 1.2  # (kg / mol)^(1/2)
+alpha = 2  # (kg / mol)^(1/2)
 degCtoK = 273.15  # add to convert °C to K
 
 # Formulas
@@ -12,6 +20,11 @@ degCtoK = 273.15  # add to convert °C to K
 def IDF(Qdi, Jw, ds):
     # Iterate to the next draw flow
     Qdf = Qdi + Jw*ds
+    return Qdf
+
+def IDFPizter(Qdi, Jw, dA):
+    # Iterate to the next draw flow
+    Qdf = Qdi + Jw*dA #L/h + (L/m^2/h * m^2 = L/h) 
     return Qdf
 
 def IFF(Qfi, Jw, ds):
@@ -26,16 +39,17 @@ def MF(Q, ns, npv):
 
 def IDC(Qdi, Cdi, Qdf, Js, ds):
     # Iterate to the next draw concentration
-    Cdf = (Qdi*Cdi*NaCl - Js*ds)/Qdf/NaCl
+    Cdf = (Qdi*Cdi*MM_NaCl - Js*ds)/Qdf/MM_NaCl
     return Cdf
 
 def IFC(Qfi, Cfi, Qff, Js, ds):
     # Iterate to the next feed concentration
-    Cff = (Qfi*Cfi*NaCl + Js*ds)/Qff/NaCl
+    Cff = (Qfi*Cfi*MM_NaCl + Js*ds)/Qff/MM_NaCl
     return Cff
 
 def OsP(C, n, R, T):
     # Osmotic pressure
+    R = 0.0831446261815324  # cm^3 bar / K / mol
     OsP = C*n*R*T
     return OsP
 
@@ -53,7 +67,7 @@ def WF(A, B, D, k, S, PId, PIf, dP, Jwt):
 
 def SF(B, D, k, S, Cd, Cf, Jw):
     # Salt flux kg/m^3/h
-    Js = B*(Cd*NaCl*math.exp(-Jw/k) - Cf*NaCl*math.exp(Jw*1e-3*S/D)) / \
+    Js = B*(Cd*MM_NaCl*math.exp(-Jw/k) - Cf*MM_NaCl*math.exp(Jw*1e-3*S/D)) / \
         (1+B/Jw*(math.exp(Jw*1e-3*S/D) - math.exp(-Jw/k)))
     return Js
 
@@ -98,7 +112,11 @@ def APhi(D, T):  # Debye-Hückel slope for the osmotic coefficient
     A_phi = 1/3*(2*PI*NA*pw/1000)**(1/2)*(e**2/(D*k*T))**(3/2)
     return A_phi
 
-def IonicStrength(Ions):
+def IonicStrength(Molal_NaCl):
+    Ions = [
+        {"molality": Molal_NaCl, "charge": 1},
+        {"molality": Molal_NaCl, "charge": -1}
+    ]
     I = 0
     for i in range(0, len(Ions)):
         I += 0.5*Ions[i]['molality']*math.pow(Ions[i]['charge'], 2)
@@ -161,7 +179,7 @@ def CphiNaCl(T, P):
         (z32 + z33*P)*T**2 + (z34 + z35*P)/(T-227) + (z36 + z37*P)/(680-T)
     return C_phi_NaCl
 
-def GammaPhi(A_phi, alpha, b, Beta_0_NaCl, Beta_1_NaCl, C_phi_NaCl, I, M, v, vm, vx, zm, zx):
+def GammaPhi(A_phi, Beta_0_NaCl, Beta_1_NaCl, C_phi_NaCl, I, M):
     ln_gamma_NaCl = -abs(zm*zx)*A_phi* \
         (math.sqrt(I)/(1 + b*math.sqrt(I)) + 2/b*math.log(1 + b*math.sqrt(I))) + \
         M*2*vm*vx/v*(2*Beta_0_NaCl + 2 * \
@@ -170,7 +188,7 @@ def GammaPhi(A_phi, alpha, b, Beta_0_NaCl, Beta_1_NaCl, C_phi_NaCl, I, M, v, vm,
     gamma_NaCl = math.exp(ln_gamma_NaCl)
     return gamma_NaCl
 
-def phi(A_phi, alpha, b, Beta_0_NaCl, Beta_1_NaCl, C_phi_NaCl, I, M, v, vm, vx, zm, zx):
+def Phi(A_phi, Beta_0_NaCl, Beta_1_NaCl, C_phi_NaCl, I, M):
     phi = 1 - abs(zm*zx)*A_phi*math.sqrt(I)/(1 + b*math.sqrt(I)) + \
         M*2*vm*vx/v*(Beta_0_NaCl + Beta_1_NaCl*math.exp(-alpha*math.sqrt(I))) + \
         M**2*2*(vm*vx)**(3/2)/v*C_phi_NaCl
@@ -219,7 +237,8 @@ def V0NaCl(T):
     V_0_NaCl = A0 + A1*(T-298.15) + A2*(T-298.15)**2 + A3*(T-298.15)**3 + A4*(T-298.15)**4
     return V_0_NaCl
 
-def VPhiNaCL(A_v, alpha, b, B_V_NaCl, C_V_NaCl, I, M, R, T, v, vm, vx, V_0_NaCl, zm, zx):
+def VPhiNaCL(A_v, B_V_NaCl, C_V_NaCl, I, M, T, V_0_NaCl):
+    R = 83.1446261815324  # cm^3 bar / K / mol
     V_phi_NaCl = V_0_NaCl + v*abs(zm*zx)*(A_v)/(2*b)*math.log(1 + b * math.sqrt(I)) + \
         2*R*T*vm*vx*(M)*(B_V_NaCl + (M)*vm*zm*C_V_NaCl)
     return V_phi_NaCl
@@ -231,11 +250,11 @@ def DensityWater(T):
         280.54253e-15*dT0(T)**5)/(1 + 16.879850e-3*dT0(T)) #g/cm^3
     return P0
 
-def ApparentDensity(M, MM_NaCl, rho_w, V_phi_NaCl):
+def ApparentDensity(M, rho_w, V_phi_NaCl):
     rho = (1000 + M*MM_NaCl)/(1000/rho_w + M*V_phi_NaCl)
     return rho
 
-def WaterActivity(M, MM_W, phi, v):
+def WaterActivity(M, phi):
     n_s = M
     n_w = 1000/MM_W
     a_w = math.exp(-phi*v*n_s/n_w)
@@ -246,6 +265,52 @@ def OsmoticPressurePitzer(a_w, MVW, T):
     PI = -R*T/(MVW)*math.log(a_w)
     return PI
 
-def MolalityToMolarity(m_NaCl, m_W, MM_NaCl, rho):
-    M = (m_NaCl/MM_NaCl)/(rho*1000/(m_NaCl + m_W)) 
+def MolarVolumeWater(rho_w):
+    MVW = MM_W/rho_w #g/mol / g/cm^3 = cm^3 / mol
+    return MVW
+
+def Molality(m_NaCl):
+    Molal_NaCl = m_NaCl/MM_NaCl
+    return Molal_NaCl
+
+def MolalityToMolarity(m_NaCl, rho):
+    m_W = 1000
+    V = (m_NaCl + m_W)/(rho*1000)
+    M = (m_NaCl/MM_NaCl)/V
     return M
+
+def mNaCl(pc_wt):
+    m_W = 1000  # mass of water g
+    m_NaCl = (pc_wt)/(1-pc_wt)*m_W  # mass of MM_NaCl g
+    return m_NaCl
+
+def QDfPcM(pc_wt, Jw, Js):
+    return 1
+
+def OsmoticProperties(P, T, pc_wt):
+    m_NaCl = mNaCl(pc_wt)
+    Molal_NaCl = Molality(m_NaCl)
+    D = RelativeDiffusivity(T, P)
+    A_phi = APhi(D, T)
+    I = IonicStrength(Molal_NaCl)
+    Beta_0_NaCl = Beta0NaCl(T, P)
+    Beta_1_NaCl = Beta1NaCl(T, P)
+    C_phi_NaCl = CphiNaCl(T, P)
+    gamma_MX = GammaPhi(A_phi,Beta_0_NaCl,Beta_1_NaCl, C_phi_NaCl, I,Molal_NaCl)
+    phi = Phi(A_phi, Beta_0_NaCl, Beta_1_NaCl, C_phi_NaCl, I, Molal_NaCl)
+    A_v = Av(T)
+    B_V_NaCl = BVNaCl(T,P)
+    C_V_NaCl = CVNaCl(T)
+    V_0_NaCl = V0NaCl(T)
+    rho_w = DensityWater(T)  # kg/L
+    V_phi_NaCl = VPhiNaCL(A_v, B_V_NaCl, C_V_NaCl, I, Molal_NaCl, T, V_0_NaCl)
+    rho = ApparentDensity(Molal_NaCl, rho_w, V_phi_NaCl)
+    a_w = WaterActivity(Molal_NaCl, phi)
+    MVW = MolarVolumeWater(rho_w)
+    M_NaCl = MolalityToMolarity(m_NaCl, rho)
+    PI_w = OsmoticPressurePitzer(a_w, MVW, T)
+    osmotic_properties = {
+        "PI": PI_w,
+        "rho": rho,
+    }
+    return osmotic_properties

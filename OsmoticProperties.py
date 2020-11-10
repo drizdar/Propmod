@@ -1,19 +1,20 @@
 import math
 import formulas as f
 R = 83.1446261815324  # cm^3 bar / K / mol
-T = 273.15 + 25
+T = 273.15 + 35
 P = 1.01325 
+# P = 200
 pc_wt = 0.26
 print(f'Percent weight {pc_wt} kg NaCl / kg Total')
-M_W = 1000  # mass of water g
+m_W = 1000  # mass of water g
 MM_NaCl = 58.44277  # g/mol
-M_NaCl = (pc_wt)/(1-pc_wt)*M_W  # mass of NaCl g
-Mo_s = M_NaCl/MM_NaCl  # molality mol/kg
-print(f'Molality {Mo_s} mol/kg')
 MM_W = 18.01528  # g/mol
+m_NaCl = (pc_wt)/(1-pc_wt)*m_W  # mass of NaCl g
+Molal_NaCl = m_NaCl/MM_NaCl  # molality mol/kg
+print(f'Molality {Molal_NaCl} mol/kg')
 Ions = [
-    {"molality": Mo_s, "charge": 1},
-    {"molality": Mo_s, "charge": -1}
+    {"molality": Molal_NaCl, "charge": 1},
+    {"molality": Molal_NaCl, "charge": -1}
 ]
 v = 2  # dissociation constant for NaCl
 vm = 1  # cations
@@ -35,9 +36,9 @@ print(f'Beta 1 MX = {Beta_1_NaCl}')
 C_phi_NaCl = f.CphiNaCl(T, P)
 print(f'C phi = {C_phi_NaCl}')
 print(f'C = {C_phi_NaCl/2*1e3}')
-gamma_MX = f.GammaPhi(A_phi,alpha,b, Beta_0_NaCl,Beta_1_NaCl, C_phi_NaCl, I,Mo_s,v,vm,vx,zm,zx)
+gamma_MX = f.GammaPhi(A_phi,alpha,b, Beta_0_NaCl,Beta_1_NaCl, C_phi_NaCl, I,Molal_NaCl,v,vm,vx,zm,zx)
 print(f'Ionic activity coefficient gamma NaCl {gamma_MX}')
-phi = f.phi(A_phi, alpha, b, Beta_0_NaCl, Beta_1_NaCl, C_phi_NaCl, I, Mo_s, v, vm, vx, zm, zx)
+phi = f.phi(A_phi, alpha, b, Beta_0_NaCl, Beta_1_NaCl, C_phi_NaCl, I, Molal_NaCl, v, vm, vx, zm, zx)
 print(f'Osmotic coefficient phi {phi}')
 A_v = f.Av(T)
 print(f'A v = {A_v}')
@@ -47,20 +48,20 @@ C_V_NaCl = f.CVNaCl(T)
 print(f'C V NaCl = {C_V_NaCl}')
 V_0_NaCl = f.V0NaCl(T)
 print(f'V 0 NaCl = {V_0_NaCl}')
-rho_w = f.PW(T)  # kg/m^3 g/L
+rho_w = f.DensityWater(T)  # kg/L
 print(f'Density of water = {rho_w} kg/L')
-V_phi_NaCl = f.VPhiNaCL(A_v, alpha, b, B_V_NaCl, C_V_NaCl, I, Mo_s, R, T, v, vm, vx, V_0_NaCl, zm, zx)
+V_phi_NaCl = f.VPhiNaCL(A_v, alpha, b, B_V_NaCl, C_V_NaCl, I, Molal_NaCl, R, T, v, vm, vx, V_0_NaCl, zm, zx)
 print(f'V phi NaCl = {V_phi_NaCl}')
-rho = (1000 + Mo_s*MM_NaCl)/(1000/rho_w + Mo_s*V_phi_NaCl)
+rho = f.ApparentDensity(Molal_NaCl, MM_NaCl, rho_w, V_phi_NaCl)
 print(f'Apparent density rho = {rho} kg/L')
-n_s = Mo_s
-n_w = 1000/MM_W
-a_w = math.exp(-phi*v*n_s/n_w)
+a_w = f.WaterActivity(Molal_NaCl, MM_W, phi, v)
 print(f'Water activity coefficient a w = {a_w}')
-VW = 1000/n_w
-M_s = Mo_s/rho
-print(f'Molarity of NaCl {M_s} mol/L')
-PI_w = -R*T/(VW)*math.log(a_w)
+MVW = MM_W/rho_w #g/mol / g/cm^3 = cm^3 / mol
+print(f'Molar Volume of water {MVW} cm^3/mol')
+M_NaCl = f.MolalityToMolarity(m_NaCl, m_W, MM_NaCl, rho)
+print(f'Molarity of NaCl {M_NaCl} mol/L')
+PI_w = f.OsmoticPressurePitzer(a_w, MVW, T)
 print(f'Osmotic Pressure (Pitzer) {PI_w} bar')
-PI_w2 = 2*R*1e-3*T*M_s
+PI_w2 = f.OsP(M_NaCl, 2, R*1e-3, T)
 print(f'Osmotic Pressure (van\'t Hoff) {PI_w2} bar')
+print(f'Difference between van\'t Hoff and Pitzer {PI_w/PI_w2}')

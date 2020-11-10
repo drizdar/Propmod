@@ -2,9 +2,9 @@ from scipy.optimize import brentq
 import math
 
 # Constants
-R = 0.083144598  # L-bar/mol-K
+R = 0.0831446261815324  # L-bar/mol-K
 n = 2  # number of ions for Van Hoff's equation
-NaCl = 58.442769  # g/mol
+NaCl = 58.44277  # g/mol
 degCtoK = 273.15  # add to convert °C to K
 
 # Formulas
@@ -46,8 +46,8 @@ def OpP(PId, PIf):
 
 def WF(A, B, D, k, S, PId, PIf, dP, Jwt):
     # Solve the water flux
-    def func(Jwt): return Jwt - A*((PId*math.exp(-Jwt/k) - PIf*math.exp(Jwt *
-                                                                        1e-3*S/D))/(1 + B/Jwt*(math.exp(Jwt*1e-3*S/D)-math.exp(-Jwt/k)))-dP)
+    def func(Jwt): return Jwt - A*((PId*math.exp(-Jwt/k) - PIf*math.exp(Jwt * 1e-3*S/D)) / \
+        (1 + B/Jwt*(math.exp(Jwt*1e-3*S/D)-math.exp(-Jwt/k)))-dP)
     Jw = brentq(func, 1e-6, 1000)  # L/m^3/h
     return Jw
 
@@ -93,9 +93,8 @@ def APhi(D, T):  # Debye-Hückel slope for the osmotic coefficient
     NA = 6.022045E23
     PI = math.pi
     pw = 1
-    k = 1.38066E-16  # erg K-1
-    # k = 1.3806049E-16 #erg K-1
-    e = 4.803242E-10  # esu 1/2997924580 C
+    k = 1.3806049E-16 #erg K-1
+    e = 4.803242E-10  # esu
     A_phi = 1/3*(2*PI*NA*pw/1000)**(1/2)*(e**2/(D*k*T))**(3/2)
     return A_phi
 
@@ -198,7 +197,7 @@ def BVNaCl(T, P):
     u12 = 1.3581172e-10
     u13 = 0
     u14 = 0
-    B_V_NaCl= u1 + u2/(T-227) + u3*T + u4*T**2 + u5/(680-T) + (P-P0)*(u6 + u7/(T-227) + \
+    B_V_NaCl = u1 + u2/(T-227) + u3*T + u4*T**2 + u5/(680-T) + (P-P0)*(u6 + u7/(T-227) + \
         u8*T + u9**T*2 + u10/(680-T)) + (P-P0)**2*(u11 + u12/(T-227) + u13*T + u14/(680-T))
     return B_V_NaCl
 def CVNaCl(T):
@@ -225,7 +224,28 @@ def VPhiNaCL(A_v, alpha, b, B_V_NaCl, C_V_NaCl, I, M, R, T, v, vm, vx, V_0_NaCl,
         2*R*T*vm*vx*(M)*(B_V_NaCl + (M)*vm*zm*C_V_NaCl)
     return V_phi_NaCl
 
-def PW(T):
+def DensityWater(T):
     dT0 = lambda T: T - 273.15
-    P0 = (0.99983952 + 16.945176e-3*dT0(T) - 7.987040e-6*dT0(T)**2 - 46.170461e-9*dT0(T)**3 + 105.56302e-12*dT0(T)**4 - 280.54253e-15*dT0(T)**5)/(1 + 16.879850e-3*dT0(T)) #g/cm^3
+    P0 = (0.99983952 + 16.945176e-3*dT0(T) - 7.987040e-6*dT0(T)**2 - \
+        46.170461e-9*dT0(T)**3 + 105.56302e-12*dT0(T)**4 - \
+        280.54253e-15*dT0(T)**5)/(1 + 16.879850e-3*dT0(T)) #g/cm^3
     return P0
+
+def ApparentDensity(M, MM_NaCl, rho_w, V_phi_NaCl):
+    rho = (1000 + M*MM_NaCl)/(1000/rho_w + M*V_phi_NaCl)
+    return rho
+
+def WaterActivity(M, MM_W, phi, v):
+    n_s = M
+    n_w = 1000/MM_W
+    a_w = math.exp(-phi*v*n_s/n_w)
+    return a_w
+
+def OsmoticPressurePitzer(a_w, MVW, T):
+    R = 83.1446261815324  # cm^3 bar / K / mol
+    PI = -R*T/(MVW)*math.log(a_w)
+    return PI
+
+def MolalityToMolarity(m_NaCl, m_W, MM_NaCl, rho):
+    M = (m_NaCl/MM_NaCl)/(rho*1000/(m_NaCl + m_W)) 
+    return M

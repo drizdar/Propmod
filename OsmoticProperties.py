@@ -7,6 +7,8 @@ print(f'Percent weight {pc_wt} kg NaCl / kg Total')
 m_NaCl = f.mNaCl(pc_wt)
 print(f'Mass of NaCl {m_NaCl} g')
 Molal_NaCl = f.Molality(m_NaCl)
+# Molal_NaCl = 6
+# m_NaCl = Molal_NaCl*58.44277
 print(f'Molality {Molal_NaCl} mol/kg')
 D = f.RelativeDiffusivity(T, P)
 print(f'Relative Diffusivity D = {D}')
@@ -39,6 +41,8 @@ V_phi_NaCl = f.VPhiNaCL(A_v, B_V_NaCl, C_V_NaCl, I, Molal_NaCl, T, V_0_NaCl)
 print(f'V phi NaCl = {V_phi_NaCl}')
 rho = f.ApparentDensity(Molal_NaCl, rho_w, V_phi_NaCl)
 print(f'Apparent density rho = {rho} kg/L')
+V = (m_NaCl + 1000)/rho
+print(f'Apparent volume = {V} cm^3')
 a_w = f.WaterActivity(Molal_NaCl, phi)
 print(f'Water activity coefficient a w = {a_w}')
 MVW = f.MolarVolumeWater(rho_w)
@@ -50,6 +54,6 @@ print(f'Osmotic Pressure (Pitzer) {PI_w} bar')
 PI_w2 = f.OsP(M_NaCl, 2, None, T)
 print(f'Osmotic Pressure (van\'t Hoff) {PI_w2} bar')
 print(f'Difference between van\'t Hoff and Pitzer {PI_w/PI_w2}')
-OP = f.OsmoticProperties(P, T, pc_wt)
-assert PI_w == OP["PI"]
-print(OP)
+PI, rho1 = f.OsmoticProperties(P, T, pc_wt)
+assert PI_w == PI
+assert rho == rho1

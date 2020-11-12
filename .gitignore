@@ -1,2 +1,8 @@
+#Ignore
 __pycache__/
 .vscode/
+local/*
+
+
+#Except
+!local/README.md

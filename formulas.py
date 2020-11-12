@@ -284,20 +284,28 @@ def mNaCl(pc_wt):
     m_NaCl = (pc_wt)/(1-pc_wt)*m_W  # mass of MM_NaCl g
     return m_NaCl
 
-def QDfPcM(pc_wt, Jw, Js):
-    return 1
-
 def OsmoticProperties(P, T, pc_wt):
     m_NaCl = mNaCl(pc_wt)
     Molal_NaCl = Molality(m_NaCl)
+    I = IonicStrength(Molal_NaCl)
+    MVW, rho, rho_w = SolutionDensity(P, T, I, Molal_NaCl)
+    a_w = OsmoticActivity(P, T, I, Molal_NaCl)
+    M_NaCl = MolalityToMolarity(m_NaCl, rho)
+    PI = OsmoticPressurePitzer(a_w, MVW, T)
+    return [PI, rho]
+
+def OsmoticActivity(P, T, I, Molal_NaCl):
     D = RelativeDiffusivity(T, P)
     A_phi = APhi(D, T)
-    I = IonicStrength(Molal_NaCl)
     Beta_0_NaCl = Beta0NaCl(T, P)
     Beta_1_NaCl = Beta1NaCl(T, P)
     C_phi_NaCl = CphiNaCl(T, P)
     gamma_MX = GammaPhi(A_phi,Beta_0_NaCl,Beta_1_NaCl, C_phi_NaCl, I,Molal_NaCl)
     phi = Phi(A_phi, Beta_0_NaCl, Beta_1_NaCl, C_phi_NaCl, I, Molal_NaCl)
+    a_w = WaterActivity(Molal_NaCl, phi)
+    return a_w
+
+def SolutionDensity(P, T, I, Molal_NaCl):
     A_v = Av(T)
     B_V_NaCl = BVNaCl(T,P)
     C_V_NaCl = CVNaCl(T)
@@ -305,12 +313,9 @@ def OsmoticProperties(P, T, pc_wt):
     rho_w = DensityWater(T)  # kg/L
     V_phi_NaCl = VPhiNaCL(A_v, B_V_NaCl, C_V_NaCl, I, Molal_NaCl, T, V_0_NaCl)
     rho = ApparentDensity(Molal_NaCl, rho_w, V_phi_NaCl)
-    a_w = WaterActivity(Molal_NaCl, phi)
     MVW = MolarVolumeWater(rho_w)
-    M_NaCl = MolalityToMolarity(m_NaCl, rho)
-    PI_w = OsmoticPressurePitzer(a_w, MVW, T)
-    osmotic_properties = {
-        "PI": PI_w,
-        "rho": rho,
-    }
-    return osmotic_properties
+    return [MVW, rho, rho_w]
+    
+def QDfPcM(pc_wt, Jw, Js):
+    
+    return 1

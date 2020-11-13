@@ -1,0 +1,34 @@
+[
+    {
+        "membrane": "HTI CTA",
+        "material": "cellulose acetate",
+        "producer": "Hydration Technology Innovation",
+        "A": 0.42,
+        "B": 0.29,
+        "S": 1028e-6
+    },
+    {
+        "membrane": "HTI Spiral",
+        "material": "cellulose acetate",
+        "producer": "Hydration Technology Innovation",
+        "A": 0.76,
+        "B": 0.44,
+        "S": 655e-6
+    },
+    {
+        "membrane": "FTS CTA",
+        "material": "cellulose acetate",
+        "producer": "Fluid Technology Solutions",
+        "A": 0.69,
+        "B": 0.34,
+        "S": 707e-6
+    },
+    {
+        "membrane": "FTS TFC",
+        "material": "thin film composite",
+        "producer": "Fluid Technology Solutions",
+        "A": 1.25,
+        "B": 0.19,
+        "S": 471e-6
+    }
+]

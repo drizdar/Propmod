@@ -51,9 +51,10 @@ M_NaCl = f.MolalityToMolarity(m_NaCl, rho)
 print(f'Molarity of NaCl {M_NaCl} mol/L')
 PI_w = f.OsmoticPressurePitzer(a_w, MVW, T)
 print(f'Osmotic Pressure (Pitzer) {PI_w} bar')
-PI_w2 = f.OsP(M_NaCl, 2, None, T)
+PI_w2 = f.OsP(M_NaCl, 2, T)
 print(f'Osmotic Pressure (van\'t Hoff) {PI_w2} bar')
 print(f'Difference between van\'t Hoff and Pitzer {PI_w/PI_w2}')
-PI, rho1 = f.OsmoticProperties(P, T, pc_wt)
+PI, rho1, C = f.OsmoticProperties(P, T, pc_wt)
 assert PI_w == PI
 assert rho == rho1
+assert C == M_NaCl

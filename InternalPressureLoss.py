@@ -8,7 +8,7 @@ import formulas as f
 pc_wt = 0.0001 #%wt
 P = 1.01325
 T = 273.15 +25
-PI, rho = f.OsmoticProperties(P, T, pc_wt)
+PI, rho, C = f.OsmoticProperties(P, T, pc_wt)
 h_c = 0.0007 #m channel height
 l_f = 0.0045 #m length between spacers
 

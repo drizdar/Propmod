@@ -297,7 +297,7 @@ def OsmoticProperties(P, T, pc_wt):
     a_w = OsmoticActivity(P, T, I, Molal_NaCl)
     M_NaCl = MolalityToMolarity(m_NaCl, rho)
     PI = OsmoticPressurePitzer(a_w, MVW, T)
-    return [PI, rho]
+    return [PI, rho, M_NaCl]
 
 def OsmoticActivity(P, T, I, Molal_NaCl):
     D = RelativeDiffusivity(T, P)
@@ -329,6 +329,18 @@ def InteropolateMu(pc_wt):
     mu = f(np.array([pc_wt]))*1e-3
     return mu
 
+def DynamicViscosity(C, T): #only valid for dilute solutions
+    A_w = 0.02939
+    B_w = 507.88
+    C_w = 149.3
+    mu_w = A_w*math.exp(B_w/(T-C_w))* 1e-3
+    A_NaCl = 0.0062
+    B_NaCl = 0.0793
+    C_NaCl = 0.0080
+    mu_NaCl = (1 + A_NaCl*math.sqrt(C) + B_NaCl*C + C_NaCl*C**2)*mu_w 
+    return mu_NaCl
+
+
 def HydraulicDiameter(h_c, l_f):    
     df = h_c/2
     flow_area = h_c*l_f - math.pi * df**2/4
@@ -350,4 +362,21 @@ def Lambda(Re):
 def PressureLoss(d_h, Lambda, rho, vel):
     dP = Lambda * rho * vel**2 / 2 / d_h * 0.01
     return dP
+
+def SchmidtNumber(mu, rho, D):
+    Sc = mu/(rho*D)
+    return Sc
+
+def MassTransportCoefficient(D, d_h, pc_wt, rho, vel):
+    mu = InteropolateMu(pc_wt)
+    Re = ReynoldsNumber(rho, vel, d_h, mu)
+    Sc = SchmidtNumber(mu, rho, D)
+    Sh = SherwoodNumber(Re, Sc)
+    k = Sh*D/d_h
+    k_LH = k*1000*3600
+    return [k, k_LH]
+
+def SherwoodNumber(Re, Sc):
+    Sh = 0.2*Re**0.57*Sc**0.4
+    return Sh
 

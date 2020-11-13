@@ -24,8 +24,8 @@ Qdi = 18.181818181818183; rep = pushReport(Qdi, "Qdi: Initial draw flow across e
 Cdi = 3.6; rep = pushReport(Cdi, "Cdi: Initial draw concentration (mol/L)", rep) if reportingOn else rep
 Qfi = 47.61904761904762; rep = pushReport(Qfi, "Qfi: Initial feed flow across element (L/h)", rep) if reportingOn else rep
 Cfi = 0.6; rep = pushReport(Cfi, "Cfi: Initial feed concentration (mol/L)", rep) if reportingOn else rep
-PId = f.OsP(Cdi, 2, R, T); rep = pushReport(PId, "PId: Draw Osmotic Pressure (bar)", rep) if reportingOn else rep
-PIf = f.OsP(Cfi, 2, R, T); rep = pushReport(PIf, "PIf: Feed Osmotic Pressure (bar)", rep) if reportingOn else rep
+PId = f.OsP(Cdi, 2, T); rep = pushReport(PId, "PId: Draw Osmotic Pressure (bar)", rep) if reportingOn else rep
+PIf = f.OsP(Cfi, 2, T); rep = pushReport(PIf, "PIf: Feed Osmotic Pressure (bar)", rep) if reportingOn else rep
 dP = (PId - PIf)/2; rep = pushReport(dP, "dP: Inital optimum pressure (bar)", rep) if reportingOn else rep
 dLd = 0.09236363636363637 
 dLf = 0.09987042758895644
@@ -53,8 +53,8 @@ Qdb = (Qdi + Qdf)/2; rep = pushReport(Qdb, "Qdb: Bulk draw flow across membrane 
 Cdb = (Cdi + Cdf)/2; rep = pushReport(Cdb, "Cdb: Bulk draw concentration (mol/L)", rep) if reportingOn else rep
 Qfb = (Qfi + Qff)/2; rep = pushReport(Qfb, "Qfb: Bulk feed flow across element (L/h)", rep) if reportingOn else rep
 Cfb = (Cfi + Cff)/2; rep = pushReport(Cfb, "Cfb: Bulk feed concentration (mol/L)", rep) if reportingOn else rep
-PId = f.OsP(Cdb, 2, R, T); rep = pushReport(PId,'PId: Draw Osmotic Pressure (bar)', rep) if reportingOn else rep
-PIf = f.OsP(Cfb, 2, R, T); rep = pushReport(PIf,'PIf: Feed Osmotic Pressure (bar)', rep) if reportingOn else rep
+PId = f.OsP(Cdb, 2, T); rep = pushReport(PId,'PId: Draw Osmotic Pressure (bar)', rep) if reportingOn else rep
+PIf = f.OsP(Cfb, 2, T); rep = pushReport(PIf,'PIf: Feed Osmotic Pressure (bar)', rep) if reportingOn else rep
 rep = pushReport("", "----Estimate Jw from bulk results", rep) if reportingOn else rep
 #estimate Jw from bulk data
 try:
@@ -77,8 +77,8 @@ while cr > 1e-12:
     Cdb = (Cdi + Cdf)/2
     Qfb = (Qfi + Qff)/2
     Cfb = (Cfi + Cff)/2
-    PId = f.OsP(Cdb, 2, R, T)
-    PIf = f.OsP(Cfb, 2, R, T)
+    PId = f.OsP(Cdb, 2, T)
+    PIf = f.OsP(Cfb, 2, T)
     Cdf = f.IDC(Qdi, Cdi, Qdf, Js, dA)
     try:
         Jw_post = f.WF(A, B, D, k, S, PId, PIf, dP, Jw_pre)

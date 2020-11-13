@@ -47,8 +47,8 @@ Qd[:,0] = 18.181818181818183; rep = pushReport(Qd[0][0], "Qdi: Initial draw flow
 Cd[:,0] = 3.6; rep = pushReport(Cd[0][0], "Cdi: Initial draw concentration (mol/L)", rep) if reportingOn else rep
 Qf[0,:] = 47.61904761904762; rep = pushReport(Qf[0][0], "Qfi: Initial feed flow across element (L/h)", rep) if reportingOn else rep
 Cf[0,:] = 0.6; rep = pushReport(Cf[0][0], "Cfi: Initial feed concentration (mol/L)", rep) if reportingOn else rep
-PId = f.OsP(Cd[0][0], n, R, T); rep = pushReport(PId, "PId: Draw Osmotic Pressure (bar)", rep) if reportingOn else rep
-PIf = f.OsP(Cf[0][0], n, R, T); rep = pushReport(PIf, "PIf: Feed Osmotic Pressure (bar)", rep) if reportingOn else rep
+PId = f.OsP(Cd[0][0], n, T); rep = pushReport(PId, "PId: Draw Osmotic Pressure (bar)", rep) if reportingOn else rep
+PIf = f.OsP(Cf[0][0], n, T); rep = pushReport(PIf, "PIf: Feed Osmotic Pressure (bar)", rep) if reportingOn else rep
 dP = (PId - PIf)/2; rep = pushReport(dP, "dP: Inital optimum pressure (bar)", rep) if reportingOn else rep
 dA = dLd * dLf; rep = pushReport(dA, "dA: Area of element (m^2)", rep) if reportingOn else rep
 H = 28*1e-3*0.0254; rep = pushReport(H,'H: Channel height (m)', rep) if reportingOn else rep #SW30XHR-400i assume same height for both
@@ -76,16 +76,13 @@ for i in range(0, nef): #rows, along feed direction
             Js[i][j] = ret['Js']
             Jw_pre = ret['Jw']
 
+Jw_avg = np.average(Jw); rep = pushReport(Jw_avg,'Jw_avg: Average membrange flux (L/m^2/h)', rep) if reportingOn else rep
+Js_avg = np.average(Js); rep = pushReport(Js_avg,'Js_avg: Average salt flux (kg/m^2/h)', rep) if reportingOn else rep
+Cd_min = Cd.min(); rep = pushReport(Cd_min,'Cd_min: Miniumum draw concentration (mol/L)', rep) if reportingOn else rep
+Cf_max = Cf.max(); rep = pushReport(Cf_max,'Cf_max: Maximum feed concentration (mol/L)', rep) if reportingOn else rep
+PDens = dP*1e5*Jw_avg/60/60/1000; rep = pushReport(PDens,'PDens: Power Density (W/m^2)', rep) if reportingOn else rep
+
 print(pd.DataFrame(rep[:,0],rep[:,1],[""]))
-print(np.average(Jw))
-Jw_avg = np.average(Jw)
-print(Cd.min())
-print(Cf.max())
-PDens = dP*1e5*Jw_avg/60/60/1000
-
-print(f'Power density PD = {PDens}')
-
-
 
 # levels = MaxNLocator(nbins=50).tick_values(Jw.min(), Jw.max())
 # instance which takes data values and translates those into levels.

@@ -72,8 +72,8 @@ def calculateElement(H, dLd, dLf, A, B, D, k, S, n, R, T, Cdi, Pdi, Qdi, Cfi, Pf
         Cdb = (Cdi + Cdf)/2
         Qfb = (Qfi + Qff)/2
         Cfb = (Cfi + Cff)/2
-        PId = f.OsP(Cdb, 2, R, T)
-        PIf = f.OsP(Cfb, 2, R, T)
+        PId = f.OsP(Cdb, 2, T)
+        PIf = f.OsP(Cfb, 2, T)
         Cdf = f.IDC(Qdi, Cdi, Qdf, Js, dA)
         try:
             Jw_post = f.WF(A, B, D, k, S, PId, PIf, dP, Jw_pre)

@@ -1,4 +1,6 @@
 from scipy.optimize import brentq
+from scipy import interpolate
+import numpy as np
 import math
 
 # Constants
@@ -47,9 +49,9 @@ def IFC(Qfi, Cfi, Qff, Js, ds):
     Cff = (Qfi*Cfi*MM_NaCl + Js*ds)/Qff/MM_NaCl
     return Cff
 
-def OsP(C, n, R, T):
+def OsP(C, n, T):
     # Osmotic pressure
-    R = 0.0831446261815324  # cm^3 bar / K / mol
+    R = 0.0831446261815324  # L bar / K / mol
     OsP = C*n*R*T
     return OsP
 
@@ -262,7 +264,10 @@ def WaterActivity(M, phi):
 
 def OsmoticPressurePitzer(a_w, MVW, T):
     R = 83.1446261815324  # cm^3 bar / K / mol
+    try:
     PI = -R*T/(MVW)*math.log(a_w)
+    except:
+        PI = 0
     return PI
 
 def MolarVolumeWater(rho_w):
@@ -316,6 +321,33 @@ def SolutionDensity(P, T, I, Molal_NaCl):
     MVW = MolarVolumeWater(rho_w)
     return [MVW, rho, rho_w]
     
-def QDfPcM(pc_wt, Jw, Js):
+def InteropolateMu(pc_wt):
+    #CRC Handbook
+    data_x = [0.01, 0.02, 0.03, 0.04, 0.05, 0.10, 0.15, 0.20] #temperature
+    data_y = [1.020, 1.036, 1.052, 1.068, 1.085, 1.193, 1.352, 1.557] #mu
+    f = interpolate.interp1d(data_x, data_y, fill_value="extrapolate")
+    mu = f(np.array([pc_wt]))*1e-3
+    return mu
+
+def HydraulicDiameter(h_c, l_f):    
+    df = h_c/2
+    flow_area = h_c*l_f - math.pi * df**2/4
+    wetted_perimeter = 2*l_f + 2*math.pi*df/2
+    d_h = 4 * flow_area/wetted_perimeter
+    return d_h
+
+def ReynoldsNumber(rho, vel, d_h, mu):
+    Re = rho * vel * d_h / mu
+    return Re
+
+def Lambda(Re):
+    alpha = 0.42
+    beta = 189.29
+    gamma = 1
+    Lambda = alpha + beta/Re**gamma
+    return Lambda
     
-    return 1
+def PressureLoss(d_h, Lambda, rho, vel):
+    dP = Lambda * rho * vel**2 / 2 / d_h * 0.01
+    return dP
+

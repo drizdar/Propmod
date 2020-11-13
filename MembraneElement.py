@@ -7,8 +7,8 @@ import formulas as f
 
 def calculateElement(H, dLd, dLf, A, B, D, k, S, n, R, T, Cdi, Pdi, Qdi, Cfi, Pfi, Qfi, Jw_i):
     #Estimate Jw from inital data
-    PId = f.OsP(Cdi, n, R, T)
-    PIf = f.OsP(Cfi, n, R, T)
+    PId = f.OsP(Cdi, n, T)
+    PIf = f.OsP(Cfi, n, T)
     dP = Pdi - Pfi
     dA = dLd * dLf
     try:
@@ -28,8 +28,8 @@ def calculateElement(H, dLd, dLf, A, B, D, k, S, n, R, T, Cdi, Pdi, Qdi, Cfi, Pf
     Cdb = (Cdi + Cdf)/2
     Qfb = (Qfi + Qff)/2
     Cfb = (Cfi + Cff)/2
-    PId = f.OsP(Cdb, n, R, T)
-    PIf = f.OsP(Cfb, n, R, T)
+    PId = f.OsP(Cdb, n, T)
+    PIf = f.OsP(Cfb, n, T)
 
     #estimate Jw from bulk data
 

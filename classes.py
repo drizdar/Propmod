@@ -4,14 +4,6 @@ import Reporting as r
 class solution:
     def __init__(self, data):
         self.data = data
-    def CalcFlow(self):
-        data = self.data
-        rho = data.get("density")
-        m_t = data.get("mass_total")
-        if (rho != None and m_t != None):
-            data["flow"] = m_t / rho
-        else:
-            raise Exception(f'density = {rho}, m_t = {m_t}: could not complete calculation')
     def CalcPcWt(self):
         data = self.data
         m_w = data.get("mass_water")
@@ -26,7 +18,26 @@ class solution:
             data["pc_wt"] = pc_wt
         else:
             raise Exception(f'mass_water = {m_w}, mass_NaCl = {m_NaCl}: could not complete calculation')
-    def CalcMass(self):
+    def CalcOsmoticProperties(self):
+        data = self.data
+        P = data.get("P")
+        T = data.get("T")
+        pc_wt = data.get("pc_wt")
+        if (P != None and T != None and pc_wt != None):
+            data["PI"], data["density"], data["molar_concentration"] = f.OsmoticProperties(P, T, pc_wt)
+        else:
+            raise Exception(f'P = {P}, T = {T}, pc_wt = {pc_wt}: could not complete calculation')
+
+class flow(solution):
+    def CalcFlow(self):
+        data = self.data
+        rho = data.get("density")
+        m_t = data.get("mass_total")
+        if (rho != None and m_t != None):
+            data["flow"] = m_t / rho
+        else:
+            raise Exception(f'density = {rho}, m_t = {m_t}: could not complete calculation')
+    def CalcMassRate(self):
         data = self.data
         pc_wt = data.get("pc_wt")
         rho = data.get("density")
@@ -41,15 +52,36 @@ class solution:
         else:
             raise Exception(f'flow = {flow}, density = {rho}, pc_wt = {pc_wt}: could not complete calculation')
 
-    def CalcOsmoticProperties(self):
+class pond(solution):
+    def CalcVolume(self):
         data = self.data
-        P = data.get("P")
-        T = data.get("T")
-        pc_wt = data.get("pc_wt")
-        if (P != None and T != None and pc_wt != None):
-            data["PI"], data["density"] = f.OsmoticProperties(P, T, pc_wt)
+        rho = data.get("density")
+        m_t = data.get("mass_total")
+        if (rho != None and m_t != None):
+            data["V"] = m_t / rho
         else:
-            raise Exception(f'P = {P}, T = {T}, pc_wt = {pc_wt}: could not complete calculation')
+            raise Exception(f'density = {rho}, m_t = {m_t}: could not complete calculation')
+    def CalcMass(self):
+        data = self.data
+        pc_wt = data.get("pc_wt")
+        rho = data.get("density")
+        V = data.get("V")
+        if (pc_wt != None and rho != None and V != None):
+            m_w = V * rho * (1-pc_wt) * 1e6
+            m_NaCl =  V * rho * (pc_wt) * 1e6
+            m_t = m_w + m_NaCl
+            data["mass_water"] = m_w
+            data["mass_NaCl"] = m_NaCl
+            data["mass_total"] = m_t
+        else:
+            raise Exception(f'V = {V}, density = {rho}, pc_wt = {pc_wt}: could not complete calculation')
+    def CalcLevel(self):
+        V = self.data.get("V")
+        A = self.data.get("A")
+        if (V != None and A != None):
+            self.data["level"] = V/A
+        else:
+            raise Exception(f'V = {V}, A = {A}: could not complete calculation')
 
 class membrane:
     def __init__(self, data, s):

@@ -1,63 +1,91 @@
-import sys
-import json
+import classes as cl
+import EvaporationPonds as ep
 import formulas as f
-from promod.misc import *
-from promod.classes import *
-input_data = loader.loadData(sys.argv)
-file = open('promod/data/membranes.json','r')
-m_data = json.loads(file.read()) #membrane data
-file.close()
-i_stage = input_data['stages'][0] #inital stage
-n_skids = i_stage['stage']['skids'] #number of skids per stage
-n_pv = i_stage['skid']['pressure_vessels'] #number of pressure vessels per skid
-n_m = i_stage['pressure_vessel']['membranes'] #number of membranes per pressure vessel
-t_pv = n_skids * n_pv #total number of pressure vessels
-print(f'There are {t_pv} pressure vessels in this stage')
-initial_draw = input_data['draw']
-initial_feed = input_data['feed']
-units = input_data['units']
-flow_units = units['flow']
-pressure_vessel_feed_flow = initial_feed['flow'] / t_pv
-print(f'The flow through each pressure vessel is {pressure_vessel_feed_flow:.3} {flow_units}')
-m_id = i_stage['membrane']['id']
-m_prop = m_data[m_id]
-m_dims = i_stage['membrane']['dimensions']
-print(f'Analysis using {m_id}')
-A = m_prop.get('A')
-B = m_prop.get('B')
-D = m_prop.get('D')
-S = m_prop.get('S')
-k = m_prop.get('k')
-Am = m_dims.get('active_area')
-Lm = m_dims.get('length')
-W = Am/Lm
-TAm = Am*n_m
-# Initial conditions
-n_eppm = 10 # number of evaluation points per membrane
-dA = Am/n_eppm
-t_ep = n_eppm * n_m
-Td = initial_draw['temperature'] + f.degCtoK
-Qd = [initial_draw['flow']/ ]
-Cd = [initial_draw['concentration']]
-PId = [f.OsP(Cd[0], f.n, f.R, Td)]
-Tf = initial_feed['temperature'] + f.degCtoK
-Qf = [initial_feed['flow']]
-Cf = [initial_feed['concentration']]
-PIf = [f.OsP(Cf[0], f.n, f.R, Tf)]
-dP = f.OpP(PId[0], PIf[0])
-Jw = [f.WF(A, B, D, k, S, PId[0], PIf[0],dP, 10)]
-Js = [f.SF(B, D, k, S, Cd[0], Cf[0], Jw[0])]
-for i in range(0, t_ep):
-    Qd.append(f.IDF(Qd[i], Jw[i], dA))
-    Qf.append(f.IFF(Qf[i], Jw[i], dA))
-    Cd.append(f.IDC(Qd[i], Cd[i], Qd[i+1], Js[i], dA))
-    Cf.append(f.IFC(Qf[i], Cf[i], Qf[i+1], Js[i], dA))
-    PId.append(f.OsP(Cd[i+1], f.n, f.R, Td))
-    PIf.append(f.OsP(Cf[i+1], f.n, f.R, Tf))
-    Jw.append(f.WF(A, B, D, k, S, PId[i+1], PIf[i+1],dP, Jw[i]))
-    Js.append(f.SF(B, D, k, S, Cd[i+1], Cf[i+1], Jw[i+1]))
-    if (Jw[i+1]) < 0.01:
-        print('Flux dropped too low')
-        break
-print(Jw)
-print(Cd)
+import math
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.dates import (MONTHLY, DateFormatter, rrulewrapper, RRuleLocator, drange)
+import numpy as np
+import pandas as pd
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
+
+T = 298.15
+P = 1.01325
+
+RO = {
+    "recovery_rate": 0.4
+}
+RO_water = cl.flow({
+    "pc_wt": 0.0001,
+    "P": P,
+    "T": T,
+    "flow": 128 #MLD
+})
+seawater = cl.flow({
+    "pc_wt": 0.035,
+    "P": P,
+    "T": T,
+    "flow": RO_water.data["flow"] / RO["recovery_rate"] #MLD
+})
+seawater.CalcOsmoticProperties()
+seawater.CalcMassRate()
+RO_water.CalcOsmoticProperties()
+RO_water.CalcMassRate()
+brine_discharge = [cl.flow({
+    "P": P,
+    "T": T,
+    "mass_water": seawater.data["mass_water"] - RO_water.data["mass_water"],
+    "mass_NaCl": seawater.data["mass_NaCl"] - RO_water.data["mass_NaCl"],
+    "mass_total": seawater.data["mass_water"] - RO_water.data["mass_water"] + \
+        seawater.data["mass_NaCl"] - RO_water.data["mass_NaCl"]
+})]
+brine_discharge[-1].CalcPcWt()
+brine_discharge[-1].CalcOsmoticProperties()
+brine_discharge[-1].CalcFlow()
+
+# This is where the logic for deciding whether to start PRO begins
+
+D = 6000 #mm
+A = 19.7*1e6 #m^2 from SizePond.py
+pond = [cl.pond({
+    "A": A,
+    "D": D,
+    "P": P,
+    "T": T,
+    "mass_water": 0,
+    "mass_NaCl": 0,
+    "mass_total": 0,
+    "level": 0,
+    "pc_wt": 0
+})]
+d = 243 #start in September just as evaporation is increasing for Summer
+
+#Filling
+while d < (243+4*365):
+    brine_discharge, pond = ep.IterateFlows(brine_discharge, pond, d)
+    print(pond[-1].data["level"], pond[-1].data["pc_wt"])
+    d += 1
+level = []
+pc_wts = []
+for p in pond:
+    level.append(p.data["level"])
+    pc_wts.append(p.data["pc_wt"])
+t = np.linspace(0, d-243, d+1-243)
+#Remove first record, it makes the graph look weird
+level.pop()
+pc_wts.pop()
+t = t[:-1]
+#Pond time-series
+fig1, ax1 = plt.subplots()
+ln1 = ax1.plot(t, level, 'g')
+ax1.set_xlabel('Time - d (days)')
+ax2 = ax1.twinx()
+ax1.set_ylabel('Height of solution in pond - h (mm)')
+ln2 = ax2.plot(t, pc_wts, 'r')
+ax2.set_ylabel('Concentration NaCl - (%wt)')
+plt.legend(ln1+ln2,['Solution Level', 'Concentration'],loc=9) #or bbox_to_anchor=(0.2, 1.0)
+plt.tight_layout()
+plt.show()
+
+#Operating

@@ -46,7 +46,7 @@ brine_discharge[-1].CalcFlow()
 
 # This is where the logic for deciding whether to start PRO begins
 
-D = 6000 #mm
+D = 9000 #mm
 A = 19.7*1e6 #m^2 from SizePond.py
 pond = [cl.pond({
     "A": A,
@@ -63,7 +63,7 @@ d = 243 #start in September just as evaporation is increasing for Summer
 
 #Filling
 while d < (243+4*365):
-    brine_discharge, pond = ep.IterateFlows(brine_discharge, pond, d)
+    brine_discharge, pond = ep.IterateFlows(brine_discharge, pond, d, D)
     print(pond[-1].data["level"], pond[-1].data["pc_wt"])
     d += 1
 level = []

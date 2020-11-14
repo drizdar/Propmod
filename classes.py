@@ -59,6 +59,7 @@ class flow(solution):
                 return flow
             if units == "m^3/d":
                 flow /= 1e3
+                return flow
             if units == "L/d":
                 return flow
         else:
@@ -86,13 +87,63 @@ class combineFlows(flow):
         self.data = {
             "P": P,
             "T": T,
-            "mass_water": m_w_1 + m_w_2,
-            "mass_NaCl": m_NaCl_1 + m_NaCl_2,
-            "mass_total": m_w_1 + m_w_2 + m_NaCl_1 + m_NaCl_2
+            "mass_water": m_w,
+            "mass_NaCl": m_NaCl,
+            "mass_total": m_t
         }
         self.CalcPcWt()
         self.CalcOsmoticProperties()
         self.CalcFlow()
+
+class averageFlows(flow):
+    def __init__(self, flow1, flow2):
+        m_w_1 = flow1.data.get("mass_water")
+        m_w_2 = flow2.data.get("mass_water")
+        m_w = (m_w_1 + m_w_2)/2
+        m_NaCl_1 = flow1.data.get("mass_NaCl")
+        m_NaCl_2 = flow2.data.get("mass_NaCl")
+        m_NaCl = (m_NaCl_1 + m_NaCl_2)/2
+        m_t_1 = m_w_1 + m_NaCl_1
+        m_t_2 = m_w_2 + m_NaCl_2
+        m_t = (m_t_1 + m_t_2)/2
+        P1 = flow1.data.get("P")
+        P2 = flow2.data.get("P")
+        T1 = flow1.data.get("T")
+        T2 = flow2.data.get("T")
+        T = (m_t_1/2 * T1 + m_t_2/2 * T2)/m_t
+        P = (m_t_1/2 * P1 + m_t_2/2 * P2)/m_t #simplification...
+        flow1 = flow1.data.get("flow")
+        flow2 = flow2.data.get("flow")
+        self.data = {
+            "P": P,
+            "T": T,
+            "mass_water": m_w,
+            "mass_NaCl": m_NaCl,
+            "mass_total": m_t
+        }
+        self.CalcPcWt()
+        self.CalcOsmoticProperties()
+        self.CalcFlow()
+
+class splitFlows(flow):
+    def __init__(self, flow, parts):
+        Q = flow.data["flow"] / parts
+        P = flow.data.get("P")
+        T = flow.data.get("T")
+        pc_wt = flow.data.get("pc_wt")
+        rho = flow.data.get("density")
+        PI = flow.data.get("PI")
+        C = flow.data.get("molar_concentration")
+        self.data = {
+            "P": P,
+            "T": T,
+            "flow": Q,
+            "pc_wt": pc_wt,
+            "density": rho,
+            "PI": PI,
+            "molar_concentration": C
+        }
+        self.CalcMassRate()
 
 class pond(solution):
     def CalcVolume(self):
@@ -154,6 +205,7 @@ class pond(solution):
 class membrane:
     def __init__(self, data, s):
         self.data = data
+        self.CalcD_h()
         self.CalcLf()
         self.data["dimensions"]["s"] = s
         self.CalcNed()
@@ -244,7 +296,8 @@ class membrane:
     def GetDimensions(self, list):
         ret_array = []
         for item in list:
-            if (item in self.data["dimensions"] and type(self.data["dimensions"][item]) == "float"):
+            item_type = type(self.data["dimensions"][item])
+            if (item in self.data["dimensions"] and (item_type == float or item_type == int)):
                 ret_array.append(self.data["dimensions"][item])
             else:
                 raise Exception(f'Item {item} was either missing or not of type "float"')

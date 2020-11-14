@@ -1,40 +1,55 @@
-import sys
+import classes as cl
+import formulas as f
 import math
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
-import formulas as f
+import pandas as pd
+import sys
 
-def calculateElement(H, dLd, dLf, A, B, D, k, S, n, R, T, Cdi, Pdi, Qdi, Cfi, Pfi, Qfi, Jw_i):
+def calculateElement(membrane, initial_draw, initial_feed, Jw_i):
     #Estimate Jw from inital data
-    PId = f.OsP(Cdi, n, T)
-    PIf = f.OsP(Cfi, n, T)
-    dP = Pdi - Pfi
-    dA = dLd * dLf
+    [d_h] = membrane.GetDimensions(["d_h"])
+    [dA] = membrane.GetDimensions(["dAm"])
+    [A, B, S] = membrane.GetProperties(["A", "B", "S"])
+    D = f.D
+    rho = initial_draw.data.get("density")
+    pc_wt = initial_draw.data.get("pc_wt")
+    vel_d = f.Velocity(membrane, initial_draw, "draw")
+    vel_f = f.Velocity(membrane, initial_feed, "feed")
+    k, k_LH = f.MassTransportCoefficient(D/60/60, d_h, pc_wt, rho*1000, vel_d)
+    PId = initial_draw.data.get("PI")
+    PIf = initial_feed.data.get("PI")
+    Pd = initial_draw.data.get("P")
+    Pf = initial_feed.data.get("P")
+    dP = Pd-Pf
     try:
-        Jw_est = f.WF(A, B, D, k, S, PId, PIf, dP, Jw_i)
+        Jw_est = f.WF(A, B, D, k_LH, S, PId, PIf, dP, Jw_i)
     except: 
         print("Jw calculation failed!")
         return None
 
     #Calculate other values
-
-    Js = f.SF(B, D, k, S, Cdi, Cfi, Jw_est)
-    Qdf = f.IDF(Qdi, Jw_est, dA)
-    Cdf = f.IDC(Qdi, Cdi, Qdf, Js, dA)
-    Qff = f.IFF(Qfi, Jw_est, dA)
-    Cff = f.IFC(Qfi, Cfi, Qff, Js, dA)
-    Qdb = (Qdi + Qdf)/2
-    Cdb = (Cdi + Cdf)/2
-    Qfb = (Qfi + Qff)/2
-    Cfb = (Cfi + Cff)/2
-    PId = f.OsP(Cdb, n, T)
-    PIf = f.OsP(Cfb, n, T)
-
+    Cdi = initial_draw.data.get("molar_concentration")
+    Cfi = initial_feed.data.get("molar_concentration")
+    Js = f.SF(B, D, k_LH, S, Cdi, Cfi, Jw_est)
+    vel_f = f.Velocity(membrane, initial_feed, "feed")
+    final_draw = f.IterateFlow(initial_draw, membrane, Js, Jw_est, "draw", vel_d)
+    final_feed = f.IterateFlow(initial_feed, membrane, Js, Jw_est, "feed", vel_f)
+    bulk_draw = cl.averageFlows(initial_draw, final_draw)
+    bulk_feed = cl.averageFlows(initial_feed, final_feed)
+    PId = initial_draw.data.get("PI")
+    PIf = initial_feed.data.get("PI")
+    rho = bulk_draw.data.get("density")
+    pc_wt = bulk_draw.data.get("pc_wt")
+    vel_d = f.Velocity(membrane, initial_draw, "draw")
+    k, k_LH = f.MassTransportCoefficient(D/60/60, d_h, pc_wt, rho*1000, vel_d)
+    Pd = bulk_draw.data.get("P")
+    Pf = bulk_feed.data.get("P")
+    dP = Pd-Pf
     #estimate Jw from bulk data
 
     try:
-        Jw_post = f.WF(A, B, D, k, S, PId, PIf, dP, Jw_est)
+        Jw_post = f.WF(A, B, D, k_LH, S, PId, PIf, dP, Jw_est)
     except: 
         print("Jw calculation failed!")
         return None
@@ -44,31 +59,29 @@ def calculateElement(H, dLd, dLf, A, B, D, k, S, n, R, T, Cdi, Pdi, Qdi, Cfi, Pf
     cr = Jw_est/Jw_post -1
     while cr > 1e-12:
         Jw_pre = Jw_post
-        Js = f.SF(B, D, k, S, Cdi, Cfi, Jw_pre)
-        Qdf = f.IDF(Qdi, Jw_pre, dA)
-        Qff = f.IFF(Qfi, Jw_pre, dA)
-        Cff = f.IFC(Qfi, Cfi, Qff, Js, dA)
-        Qdb = (Qdi + Qdf)/2
-        Cdb = (Cdi + Cdf)/2
-        Qfb = (Qfi + Qff)/2
-        Cfb = (Cfi + Cff)/2
-        PId = f.OsP(Cdb, 2, R, T)
-        PIf = f.OsP(Cfb, 2, R, T)
-        Cdf = f.IDC(Qdi, Cdi, Qdf, Js, dA)
+        Cdi = initial_draw.data.get("molar_concentration")
+        Cfi = initial_feed.data.get("molar_concentration")
+        Js = f.SF(B, D, k_LH, S, Cdi, Cfi, Jw_est)
+        vel_f = f.Velocity(membrane, initial_feed, "feed")
+        final_draw = f.IterateFlow(initial_draw, membrane, Js, Jw_pre, "draw", vel_d)
+        final_feed = f.IterateFlow(initial_feed, membrane, Js, Jw_pre, "feed", vel_f)
+        bulk_draw = cl.averageFlows(initial_draw, final_draw)
+        bulk_feed = cl.averageFlows(initial_feed, final_feed)
+        PId = initial_draw.data.get("PI")
+        PIf = initial_feed.data.get("PI")
+        rho = bulk_draw.data.get("density")
+        pc_wt = bulk_draw.data.get("pc_wt")
+        vel_d = f.Velocity(membrane, initial_draw, "draw")
+        k, k_LH = f.MassTransportCoefficient(D/60/60, d_h, pc_wt, rho*1000, vel_d)
+        Pd = bulk_draw.data.get("P")
+        Pf = bulk_feed.data.get("P")
+        dP = Pd-Pf
+
         try:
-            Jw_post = f.WF(A, B, D, k, S, PId, PIf, dP, Jw_pre)
+            Jw_post = f.WF(A, B, D, k_LH, S, PId, PIf, dP, Jw_pre)
         except: 
             print("Jw calculation failed!")
             return None
         cr = abs(Jw_pre/Jw_post -1)
-
-    #Calculate final results
-
-    Vdi = f.V(Qdi, dLf, H)
-    Vdf = f.V(Qdf, dLf, H)
-    Pdf = f.BPD(Pdi, Vdi, Vdf, 1400, 1400)
-    Vfi = f.V(Qfi, dLd, H)
-    Vff = f.V(Qff, dLd, H)
-    Pff = f.BPD(Pfi, Vfi, Vff, 1200, 1200)
-
-    return {"Jw": Jw_post, "Js": Js, "Cdf": Cdf, "Pdf": Pdf, "Qdf": Qdf, "Cff": Cff, "Pff": Pff, "Qff": Qff}
+    Pd = final_draw.data.get("P")
+    return {"Jw": Jw_post, "Js": Js, "Pd": Pd, "final_draw": final_draw, "final_feed": final_feed}

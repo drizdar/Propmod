@@ -59,15 +59,15 @@ infiltration_losses = []
 for i in range(0, 365):
     infiltration_losses.append(infiltration_loss)
 
-A = 19.7*1e6 #m^2
-D = 6000 #mm
+A = 21*1e6 #m^2
+D = 9000 #mm
 m_brine_w = brine_discharge.data["mass_water"]
 m_brine_NaCl = brine_discharge.data["mass_NaCl"]
 rho_w = f.DensityWater(T)
 
 def SizePond(A, D, evaporation, infiltration_loss, m_brine_w, m_brine_NaCl, rainfall, rho_w):
     h = 0
-    while h < 6000:
+    while h < D:
         H = [cl.flow({
                 "P": P,
                 "T": T,
@@ -82,7 +82,7 @@ def SizePond(A, D, evaporation, infiltration_loss, m_brine_w, m_brine_NaCl, rain
         hh = np.array(H[0].data["flow"]/A)
         pc_wts = np.array([H[0].data["pc_wt"]])
         iterations = 0
-        while (h < 6000 and pc_wts[len(pc_wts)-1] < 0.265):
+        while (h < D and pc_wts[len(pc_wts)-1] < 0.265):
             d+=1
             previous_day = H[len(H)-1]
             dd = d % 365

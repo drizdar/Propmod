@@ -45,7 +45,7 @@ RO_brine = cl.flow({
 RO_brine.CalcPcWt()
 RO_brine.CalcOsmoticProperties()
 RO_brine.CalcFlow()
-gamma_D = 0.3
+gamma_D = 0.5
 gamma_F = 1-gamma_D
 Qb = RO_brine.GetFlow("L/d")
 Qc = Qb * gamma_D/gamma_F
@@ -106,7 +106,7 @@ while d < (d_start+n_years*365):
         concentrate[-1].CalcOsmoticProperties()
         concentrate[-1].CalcMassRate()
         discharge.append(cl.combineFlows(discharge[0], concentrate[-1]))
-        PRO.append(mf.calculate(RO_brine, concentrate))
+        PRO.append(mf.calculate(concentrate[-1], RO_brine))
     else:
         concentrate.append(cl.flow(no_flow))
         PRO.append(no_PRO)
@@ -115,9 +115,7 @@ while d < (d_start+n_years*365):
         pond[-1].data["level"],
         pond[-1].data["pc_wt"],
         concentrate[-1].data["flow"], 
-        discharge[-1].data["flow"],
-        pond[-1].data["level_NaCl"],
-        pond[-1].data["mass_NaCl_solid"])
+        discharge[-1].data["flow"])
     d += 1
 
 

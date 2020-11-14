@@ -1,11 +1,13 @@
+import classes as cl
+import math
+import numpy as np
 from scipy.optimize import brentq
 from scipy import interpolate
-import numpy as np
-import math
 
 # Constants
 R = 0.0831446261815324  # L-bar/mol-K
 n = 2  # number of ions for Van Hoff's equation
+D = 6.25e-06 #m^2/h
 MM_NaCl = 58.44277  # g/mol
 MM_W = 18.01528  # g/mol
 v = 2  # dissociation constant for NaCl
@@ -19,19 +21,14 @@ degCtoK = 273.15  # add to convert °C to K
 
 # Formulas
 
-def IDF(Qdi, Jw, ds):
+def IDF(Qdi, Jw, dA):
     # Iterate to the next draw flow
-    Qdf = Qdi + Jw*ds
+    Qdf = Qdi + Jw*dA
     return Qdf
 
-def IDFPizter(Qdi, Jw, dA):
-    # Iterate to the next draw flow
-    Qdf = Qdi + Jw*dA #L/h + (L/m^2/h * m^2 = L/h) 
-    return Qdf
-
-def IFF(Qfi, Jw, ds):
+def IFF(Qfi, Jw, dA):
     # Iterate to the next feed flow
-    Qff = Qfi - Jw*ds
+    Qff = Qfi - Jw*dA
     return Qff
 
 def MF(Q, ns, npv):
@@ -39,14 +36,14 @@ def MF(Q, ns, npv):
     Qm = Q/ns/npv
     return Qm
 
-def IDC(Qdi, Cdi, Qdf, Js, ds):
+def IDC(Qdi, Cdi, Qdf, Js, dA):
     # Iterate to the next draw concentration
-    Cdf = (Qdi*Cdi*MM_NaCl - Js*ds)/Qdf/MM_NaCl
+    Cdf = (Qdi*Cdi*MM_NaCl - Js*dA)/Qdf/MM_NaCl
     return Cdf
 
-def IFC(Qfi, Cfi, Qff, Js, ds):
+def IFC(Qfi, Cfi, Qff, Js, dA):
     # Iterate to the next feed concentration
-    Cff = (Qfi*Cfi*MM_NaCl + Js*ds)/Qff/MM_NaCl
+    Cff = (Qfi*Cfi*MM_NaCl + Js*dA)/Qff/MM_NaCl
     return Cff
 
 def OsP(C, n, T):
@@ -82,8 +79,7 @@ def V(Q, L, H):
 
 def BPD(Pi, Vi, Vf, Di, Df):
     # Pressure drop using Bernoulli's equation assuming density is equal
-    # Velocity component from Pa to bar
-    Pf = Pi + (0.5*Vi**2*Di - 0.5*Vf**2*Df)/1e5
+    Pf = Pi + (0.5*Vi**2*Di - 0.5*Vf**2*Df)/1e5 # bar
     return Pf
 
 def RelativeDiffusivity(T, P):
@@ -265,7 +261,7 @@ def WaterActivity(M, phi):
 def OsmoticPressurePitzer(a_w, MVW, T):
     R = 83.1446261815324  # cm^3 bar / K / mol
     try:
-    PI = -R*T/(MVW)*math.log(a_w)
+        PI = -R*T/(MVW)*math.log(a_w)
     except:
         PI = 0
     return PI
@@ -320,7 +316,7 @@ def SolutionDensity(P, T, I, Molal_NaCl):
     rho = ApparentDensity(Molal_NaCl, rho_w, V_phi_NaCl)
     MVW = MolarVolumeWater(rho_w)
     return [MVW, rho, rho_w]
-    
+
 def InteropolateMu(pc_wt):
     #CRC Handbook
     data_x = [0.01, 0.02, 0.03, 0.04, 0.05, 0.10, 0.15, 0.20] #temperature
@@ -358,9 +354,19 @@ def Lambda(Re):
     gamma = 1
     Lambda = alpha + beta/Re**gamma
     return Lambda
-    
-def PressureLoss(d_h, Lambda, rho, vel):
-    dP = Lambda * rho * vel**2 / 2 / d_h * 0.01
+
+def PressureLossPerLength(d_h, lam, rho, vel):
+    dPdL = lam * rho * vel**2 / 2 / d_h * 0.01
+    return dPdL
+
+def PressureLoss(membrane, pc_wt, rho, side, vel):
+    [dL] = membrane.GetDimensions(["dLd"]) if side == "draw" else membrane.GetDimensions(["dLf"])
+    mu = InteropolateMu(pc_wt)
+    [d_h] = membrane.GetDimensions(["d_h"])
+    Re = ReynoldsNumber(rho, vel, d_h, mu)
+    lam = Lambda(Re)
+    dPdL = PressureLossPerLength(d_h, lam, rho, vel)
+    dP = dPdL * dL
     return dP
 
 def SchmidtNumber(mu, rho, D):
@@ -380,3 +386,36 @@ def SherwoodNumber(Re, Sc):
     Sh = 0.2*Re**0.57*Sc**0.4
     return Sh
 
+def Velocity(membrane, flow, side):
+    [dAc] = membrane.GetDimensions(["dAd"]) if side == "draw" else membrane.GetDimensions(["dAf"])
+    Q = flow.GetFlow("m^3/d")
+    vel = Q/dAc/3600/24 #m/s
+    return vel
+
+def IterateFlow(flow, membrane, Js, Jw, side, vel):
+    [dA] = membrane.GetDimensions(["dAm"])
+    P = flow.data.get("P")
+    T = flow.data.get("T")
+    rho = flow.data.get("density")
+    rho_w = DensityWater(T)
+    pc_wt = flow.data.get("pc_wt")
+    m_w_i = flow.data.get("mass_water")
+    m_NaCl_i = flow.data.get("mass_NaCl")
+    if side == "draw":
+        m_w_f = m_w_i + Jw*dA*rho_w
+        m_NaCl_f = m_NaCl_i - Js*dA
+    else: 
+        m_w_f = m_w_i - Jw*dA*rho_w
+        m_NaCl_f = m_NaCl_i + Js*dA
+    dP = PressureLoss(membrane, pc_wt, rho, side, vel)
+    next_flow = cl.flow({
+        "P": P-dP,
+        "T": T,
+        "mass_water": m_w_f,
+        "mass_NaCl": m_NaCl_f,
+        "mass_total": m_w_f + m_NaCl_f
+    })
+    next_flow.CalcPcWt()
+    next_flow.CalcOsmoticProperties()
+    next_flow.CalcFlow()
+    return next_flow

@@ -43,14 +43,56 @@ class flow(solution):
         rho = data.get("density")
         flow = data.get("flow")
         if (pc_wt != None and rho != None and flow != None):
-            m_w = flow * rho * (1-pc_wt) * 1e6
-            m_NaCl =  flow * rho * (pc_wt) * 1e6
+            m_w = flow * rho * (1-pc_wt)
+            m_NaCl =  flow * rho * (pc_wt)
             m_t = m_w + m_NaCl
             data["mass_water"] = m_w
             data["mass_NaCl"] = m_NaCl
             data["mass_total"] = m_t
         else:
             raise Exception(f'flow = {flow}, density = {rho}, pc_wt = {pc_wt}: could not complete calculation')
+    def GetFlow(self, units):
+        flow = self.data.get("flow")
+        if flow != None:
+            if units == "MLD":
+                flow /= 1e6
+                return flow
+            if units == "m^3/d":
+                flow /= 1e3
+            if units == "L/d":
+                return flow
+        else:
+            raise Exception(f'flow = {flow}: could not complete get')
+
+class combineFlows(flow):
+    def __init__(self, flow1, flow2):
+        m_w_1 = flow1.data.get("mass_water")
+        m_w_2 = flow2.data.get("mass_water")
+        m_w = m_w_1 + m_w_2
+        m_NaCl_1 = flow1.data.get("mass_NaCl")
+        m_NaCl_2 = flow2.data.get("mass_NaCl")
+        m_NaCl = m_NaCl_1 + m_NaCl_2
+        m_t_1 = m_w_1 + m_NaCl_1
+        m_t_2 = m_w_2 + m_NaCl_2
+        m_t = m_t_1 + m_t_2
+        P1 = flow1.data.get("P")
+        P2 = flow2.data.get("P")
+        T1 = flow1.data.get("T")
+        T2 = flow2.data.get("T")
+        T = (m_t_1 * T1 + m_t_2 * T2)/m_t
+        P = (m_t_1 * P1 + m_t_2 * P2)/m_t #simplification...
+        flow1 = flow1.data.get("flow")
+        flow2 = flow2.data.get("flow")
+        self.data = {
+            "P": P,
+            "T": T,
+            "mass_water": m_w_1 + m_w_2,
+            "mass_NaCl": m_NaCl_1 + m_NaCl_2,
+            "mass_total": m_w_1 + m_w_2 + m_NaCl_1 + m_NaCl_2
+        }
+        self.CalcPcWt()
+        self.CalcOsmoticProperties()
+        self.CalcFlow()
 
 class pond(solution):
     def CalcVolume(self):
@@ -67,8 +109,8 @@ class pond(solution):
         rho = data.get("density")
         V = data.get("V")
         if (pc_wt != None and rho != None and V != None):
-            m_w = V * rho * (1-pc_wt) * 1e6
-            m_NaCl =  V * rho * (pc_wt) * 1e6
+            m_w = V * rho * (1-pc_wt)
+            m_NaCl =  V * rho * (pc_wt)
             m_t = m_w + m_NaCl
             data["mass_water"] = m_w
             data["mass_NaCl"] = m_NaCl
@@ -82,6 +124,32 @@ class pond(solution):
             self.data["level"] = V/A
         else:
             raise Exception(f'V = {V}, A = {A}: could not complete calculation')
+
+    def CalcNaClSolidLevel(self):
+        A = self.data.get("A") #m^2
+        m_NaCl_s = self.data.get("mass_NaCl_solid")
+        if (A != None and m_NaCl_s != None):
+            rho_NaCl_s = 2.17 #kg/L
+            V = m_NaCl_s/rho_NaCl_s #L
+            h = V/A #mm
+            self.data["level_NaCl"] = h
+        else:
+            raise Exception(f'A = {A}, m_NaCl_s = {m_NaCl_s}: could not complete calculation')
+    
+    def CalcMassOfDepthSolidNaCl(self, d):
+        A = self.data.get("A") #m^2
+        m_NaCl_s = self.data.get("mass_NaCl_solid")
+        if (A != None and m_NaCl_s != None):
+            if d < 0:
+                return 0
+            rho_NaCl_s = 2.17 #kg/L
+            V = m_NaCl_s/rho_NaCl_s #L
+            h = V/A #mm
+            r = d/h if d < h else 1
+            d_m_NaCl_s = m_NaCl_s * r
+            return d_m_NaCl_s
+        else:
+            raise Exception(f'A = {A}, m_NaCl_s = {m_NaCl_s}: could not complete calculation')
 
 class membrane:
     def __init__(self, data, s):

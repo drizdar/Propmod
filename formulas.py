@@ -65,7 +65,7 @@ def WF(A, B, D, k, S, PId, PIf, dP, Jwt):
     return Jw
 
 def SF(B, D, k, S, Cd, Cf, Jw):
-    # Salt flux kg/m^3/h
+    # Salt flux g/L/h/m^2
     Js = B*(Cd*MM_NaCl*math.exp(-Jw/k) - Cf*MM_NaCl*math.exp(Jw*1e-3*S/D)) / \
         (1+B/Jw*(math.exp(Jw*1e-3*S/D) - math.exp(-Jw/k)))
     return Js
@@ -403,10 +403,10 @@ def IterateFlow(flow, membrane, Js, Jw, side, vel):
     m_NaCl_i = flow.data.get("mass_NaCl")
     if side == "draw":
         m_w_f = m_w_i + Jw*dA*rho_w
-        m_NaCl_f = m_NaCl_i - Js*dA
+        m_NaCl_f = m_NaCl_i - Js*1e-3*dA
     else: 
         m_w_f = m_w_i - Jw*dA*rho_w
-        m_NaCl_f = m_NaCl_i + Js*dA
+        m_NaCl_f = m_NaCl_i + Js*1e-3*dA
     dP = PressureLoss(membrane, pc_wt, rho, side, vel)
     next_flow = cl.flow({
         "P": P-dP,

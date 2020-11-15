@@ -65,7 +65,7 @@ def WF(A, B, D, k, S, PId, PIf, dP, Jwt):
     return Jw
 
 def SF(B, D, k, S, Cd, Cf, Jw):
-    # Salt flux g/L/h/m^2
+    # Salt flux g/m^2/h
     Js = B*(Cd*MM_NaCl*math.exp(-Jw/k) - Cf*MM_NaCl*math.exp(Jw*1e-3*S/D)) / \
         (1+B/Jw*(math.exp(Jw*1e-3*S/D) - math.exp(-Jw/k)))
     return Js

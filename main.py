@@ -64,7 +64,7 @@ no_volume = {
     "mass_total": 0,
     "level": 0,
     "pc_wt": 0,
-    "mass_NaCl_solid": 0
+    "mass_NaCl_solid": 450*A*2.17 #450mm bed existing
 }
 no_flow = {
     "P": P,

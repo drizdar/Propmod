@@ -356,16 +356,17 @@ def Lambda(Re):
     return Lambda
 
 def PressureLossPerLength(d_h, lam, rho, vel):
-    dPdL = lam * rho * vel**2 / 2 / d_h * 0.01
+    dPdL = lam * rho * vel**2 / (2*d_h)*0.01 #kPa to bar
     return dPdL
 
 def PressureLoss(membrane, pc_wt, rho, side, vel):
     [dL] = membrane.GetDimensions(["dLd"]) if side == "draw" else membrane.GetDimensions(["dLf"])
+    [ne] = membrane.GetDimensions(["nef"]) if side == "draw" else membrane.GetDimensions(["ned"])
     mu = InteropolateMu(pc_wt)
     [d_h] = membrane.GetDimensions(["d_h"])
-    Re = ReynoldsNumber(rho, vel, d_h, mu)
+    Re = ReynoldsNumber(rho*1000, vel, d_h, mu) #convert density to kg/m^3, all units are SI
     lam = Lambda(Re)
-    dPdL = PressureLossPerLength(d_h, lam, rho, vel)
+    dPdL = PressureLossPerLength(d_h, lam, rho, vel) #convert density to kg/m^3, all units are SI
     dP = dPdL * dL
     return dP
 
@@ -402,11 +403,11 @@ def IterateFlow(flow, membrane, Js, Jw, side, vel):
     m_w_i = flow.data.get("mass_water")
     m_NaCl_i = flow.data.get("mass_NaCl")
     if side == "draw":
-        m_w_f = m_w_i + Jw*dA*rho_w
-        m_NaCl_f = m_NaCl_i - Js*1e-3*dA
+        m_w_f = m_w_i + Jw*24*dA*rho_w
+        m_NaCl_f = m_NaCl_i - Js*24*1e-3*dA
     else: 
-        m_w_f = m_w_i - Jw*dA*rho_w
-        m_NaCl_f = m_NaCl_i + Js*1e-3*dA
+        m_w_f = m_w_i - Jw*24*dA*rho_w
+        m_NaCl_f = m_NaCl_i + Js*24*1e-3*dA
     dP = PressureLoss(membrane, pc_wt, rho, side, vel)
     next_flow = cl.flow({
         "P": P-dP,

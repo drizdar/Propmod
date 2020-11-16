@@ -1,6 +1,7 @@
 import classes as cl
 import EvaporationPonds as ep
 import formulas as f
+import json
 import math
 import matplotlib
 import matplotlib.pyplot as plt
@@ -45,16 +46,13 @@ RO_brine = cl.flow({
 RO_brine.CalcPcWt()
 RO_brine.CalcOsmoticProperties()
 RO_brine.CalcFlow()
-gamma_D = 0.5
-gamma_F = 1-gamma_D
-Qb = RO_brine.GetFlow("L/d")
-Qc = Qb * gamma_D/gamma_F
+
 
 D = 9000 #mm
 A = 24.8e6 #m^2 play around with this until it looks good
 d_start = 243 #start in September just as evaporation is increasing for Summer
 d = d_start
-n_years = 5
+n_years = 2
 
 no_volume = {
     "A": A,
@@ -90,6 +88,8 @@ PRO = [{
     "J_s_avg": 0,
     "Pd_avg": 0
 }]
+mix_ratio = 1.209163317980615
+Qb = RO_brine.GetFlow("MLD")
 # This is where the logic for deciding whether to start PRO begins
 
 while d < (d_start+n_years*365):
@@ -101,12 +101,11 @@ while d < (d_start+n_years*365):
             "P": 1.01325,
             "T": 273.15 + 25,
             "pc_wt": pond_pc_wt,
-            "flow": Qc
+            "flow": Qb*mix_ratio
         }))
         concentrate[-1].CalcOsmoticProperties()
         concentrate[-1].CalcMassRate()
         discharge.append(cl.combineFlows(discharge[0], concentrate[-1]))
-        PRO.append(mf.calculate(concentrate[-1], RO_brine))
     else:
         concentrate.append(cl.flow(no_flow))
         PRO.append(no_PRO)

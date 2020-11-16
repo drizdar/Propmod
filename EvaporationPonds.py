@@ -85,4 +85,30 @@ def IterateFlows(concentrate, d, D, discharge, pond):
     pond[-1].CalcVolume()
     pond[-1].CalcLevel()
     pond[-1].CalcNaClSolidLevel()
+    cr = 1
+    post = pond[-1].data["mass_NaCl"]
+    while cr > 1e-12:
+        pre = post
+        pond_pc_wt = pond[-1].data.get("pc_wt")
+        if pond_pc_wt > 0.265: #saturation level
+            pond_m_t = pond[-1].data.get("mass_total")
+            pond_m_NaCl = pond[-1].data.get("mass_NaCl")
+            NaCl_to_solid = pond_m_t*(pond_pc_wt-0.265)
+            pond[-1].data["mass_NaCl_solid"] += NaCl_to_solid
+            pond[-1].data["mass_NaCl"] -= NaCl_to_solid
+        else:
+            m_NaCl_s = pond[-1].data.get("mass_NaCl_solid")
+            if m_NaCl_s > 0:
+                pond_m_t = pond[-1].data.get("mass_total")
+                NaCl_to_aqueous = min(pond[-1].CalcMassOfDepthSolidNaCl(dissolution_rate), pond_m_t*(0.265-pond_pc_wt))
+                pond[-1].data["mass_NaCl_solid"] -= NaCl_to_aqueous
+                pond[-1].data["mass_NaCl"] += NaCl_to_aqueous
+        post = pond[-1].data["mass_NaCl"]
+        pond[-1].CalcPcWt()
+        pond[-1].CalcOsmoticProperties()
+        pond[-1].CalcVolume()
+        pond[-1].CalcLevel()
+        pond[-1].CalcNaClSolidLevel()
+        cr = abs(pre/post -1)
+
     return pond

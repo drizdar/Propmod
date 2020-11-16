@@ -82,37 +82,3 @@ def calculate(membrane, initial_draw, initial_feed):
     SE = DeltaW * DeltaP / (Qdi+Qfi)
 
     return [Jw, Jw_avg, Js, Js_avg, PPd, PPf, PDens, SE]
-
-def graphJw(Jw, membrane):
-    # levels = MaxNLocator(nbins=50).tick_values(Jw.min(), Jw.max())
-    # instance which takes data values and translates those into levels.
-    # cmap = plt.get_cmap('rainbow')
-    # norm = BoundaryNorm(levels, ncolors=cmap.N, clip=True)
-
-    # fig, (ax0, ax1) = plt.subplots(nrows=2)
-    # im = ax0.pcolormesh(x, y, Jw, cmap=cmap, norm=norm)
-    # fig.colorbar(im, ax=ax0)
-    # ax0.set_title('pcolormesh with levels')
-
-
-    # # contours are *point* based plots, so convert our bound into point
-    # # centers
-    # # cf = ax1.contourf(x[:-1] + dLd/2., y[:-1] + dLf/2., Jw, levels=levels, cmap=cmap)
-
-    # fig = plt.figure(figsize=(4,6),tight_layout=True)
-    # ax = fig.add_axes([0.1,0.1,0.8,0.8])
-    # cf = ax.contour(x, y, Jw, colors='black')
-    # ax.clabel(cf, inline=True, fontsize=6)
-    [dLd, dLf, Ld, Lf, ned, nef] = membrane.GetDimensions(["dLd", "dLf", "Ld", "Lf", "ned", "nef"])
-    [n_leaves] = membrane.GetProperties(["n_leaves"])
-    Lff = Lf/n_leaves
-    x = np.linspace(dLd/2, Ld-dLd/2, ned)
-    y = np.linspace(Lff-dLf/2, dLf/2, nef)
-    plt.figure()
-    cp = plt.contour(x[:], y[:], Jw, colors='black')
-    plt.clabel(cp, inline=True, fontsize=6)
-    plt.title(r'Flux on membrane surface $(L\ h^{-1}\ m^{-2})$')
-    plt.xlabel(r'Draw position $(m)$')
-    plt.ylabel(r'Feed position $(m)$')
-    plt.show()
-    # plt.savefig('test.png')

@@ -5,6 +5,7 @@ import json
 
 fs = open('membrane_data.json', 'r')
 data = json.loads(fs.read())
+data[0]["n_leaves"] = 7
 s = 0.1
 membrane = cl.membrane({
     "properties": data[0],
@@ -15,6 +16,7 @@ membrane = cl.membrane({
         "Ss": 0.0045 #m
     }
 },s)
+membrane.CalcElementDimensions()
 [dAd, dA] = membrane.GetDimensions(["dAd", "dAm"]) #m^2
 
 Qi = 100 #L/h
@@ -67,7 +69,9 @@ print(Ci, Cf)
 #     Cdf = flow.data.get("molar_concentration")
 #     return [Qdf, Cdf]
 
-[Qf, Cf] = f.IterateFlow(flow, membrane, Js, Jw, "draw", Vi)
+new_draw = f.IterateFlow(flow, membrane, Js, Jw, "draw", Vi)
+Qf = new_draw.GetFlow("L/d")/24
+Cf = new_draw.data["molar_concentration"]
 
 print(Qi, Qf)
 print(Ci, Cf)
@@ -98,7 +102,9 @@ Ci = flow.data.get("molar_concentration")
 Cf = f.IFC(Qi, Ci, Qf, Js, dA)
 print(Ci, Cf)
 
-[Qf, Cf] = f.IterateFlow(flow, membrane, Js, Jw, "feed", Vi)
+new_feed = f.IterateFlow(flow, membrane, Js, Jw, "feed", Vi)
+Qf = new_feed.GetFlow("L/d")/24
+Cf = new_feed.data["molar_concentration"]
 
 print(Qi, Qf)
 print(Ci, Cf)

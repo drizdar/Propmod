@@ -35,7 +35,7 @@ Mpv = 7 #number of membrane elements per pressure vessel
 h_c = 0.0007 #m - channel height
 l_f = 0.0045 #m - length between spacers
 
-T = 31.6 #deg C
+T = 25 #deg C
 mu  = 0.001*(1 + 0.636*(T-20)/41)**(-1/0.636)   #Kg m-1 s-1 -> from "Pawlowski, J., 1991. Veränderliche Stoffgrössen in der Ähnlichkeitstheorie. Frankfurt am Main: Salle."
 
 

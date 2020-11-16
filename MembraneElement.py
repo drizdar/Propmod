@@ -25,8 +25,7 @@ def calculateElement(membrane, initial_draw, initial_feed, Jw_i):
     try:
         Jw_est = f.WF(A, B, D, k_LH, S, PId, PIf, dP, Jw_i)
     except: 
-        print("Jw calculation failed!")
-        return None
+        raise Exception("Jw calculation failed!")
 
     #Calculate other values
     Cdi = initial_draw.data.get("molar_concentration")
@@ -51,8 +50,7 @@ def calculateElement(membrane, initial_draw, initial_feed, Jw_i):
     try:
         Jw_post = f.WF(A, B, D, k_LH, S, PId, PIf, dP, Jw_est)
     except: 
-        print("Jw calculation failed!")
-        return None
+        raise Exception("Jw calculation failed!")
 
     #Converge results
 
@@ -80,8 +78,8 @@ def calculateElement(membrane, initial_draw, initial_feed, Jw_i):
         try:
             Jw_post = f.WF(A, B, D, k_LH, S, PId, PIf, dP, Jw_pre)
         except: 
-            print("Jw calculation failed!")
-            return None
+            raise Exception("Jw calculation failed!")
         cr = abs(Jw_pre/Jw_post -1)
+
     Pd = final_draw.data.get("P")
-    return {"Jw": Jw_post, "Js": Js, "Pd": Pd, "final_draw": final_draw, "final_feed": final_feed}
+    return {"Jw": Jw_post, "Js": Js, "Pd": Pd, "Pf": Pf, "final_draw": final_draw, "final_feed": final_feed}

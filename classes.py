@@ -55,11 +55,9 @@ class flow(solution):
         flow = self.data.get("flow")
         if flow != None:
             if units == "MLD":
-                flow /= 1e6
-                return flow
+                return flow/1e6
             if units == "m^3/d":
-                flow /= 1e3
-                return flow
+                return flow/1e3
             if units == "L/d":
                 return flow
         else:
@@ -208,13 +206,6 @@ class membrane:
         self.CalcD_h()
         self.CalcLf()
         self.data["dimensions"]["s"] = s
-        self.CalcNed()
-        self.CalcNef()
-        self.CalcDLd()
-        self.CalcDLf()
-        self.CalcDAd()
-        self.CalcDAf()
-        self.CalcDAm()
     def CalcD_h(self):
         dims = self.data["dimensions"]
         Hc = dims.get("Hc")
@@ -231,6 +222,14 @@ class membrane:
             dims["Lf"] = Am/Ld
         else:
             raise Exception(f'Am = {Am}, Ld = {Ld}: could not complete calculations')
+    def CalcElementDimensions(self):
+        self.CalcNed()
+        self.CalcNef()
+        self.CalcDLd()
+        self.CalcDLf()
+        self.CalcDAd()
+        self.CalcDAf()
+        self.CalcDAm()
     def CalcNed(self):
         dims = self.data["dimensions"]
         Ld = dims.get("Ld")
@@ -241,13 +240,14 @@ class membrane:
             raise Exception(f'Ld = {Ld}, s = {s}: could not complete calculations')
     def CalcNef(self):
         dims = self.data["dimensions"]
+        n_leaves = self.data["properties"].get("n_leaves")
         Ld = dims.get("Lf")
         s = dims.get("s")
-        if (Ld != None and s != None):
-            dims["nef"] = math.ceil(Ld/s)
+        if (Ld != None and s != None and n_leaves != None):
+            dims["nef"] = math.ceil(Ld/n_leaves/s)
         else:
-            raise Exception(f'Ld = {Ld}, s = {s}: could not complete calculations')
-    def CalcDLd(self):
+            raise Exception(f'Ld = {Ld}, n_leaves = {n_leaves}, s = {s}: could not complete calculations')
+    def CalcDLd(self): #length of element in draw flow direction
         dims = self.data["dimensions"]
         Ld = dims.get("Ld")
         ned = dims.get("ned")
@@ -255,30 +255,31 @@ class membrane:
             dims["dLd"] = Ld/ned
         else:
             raise Exception(f'Ld = {Ld}, ned = {ned}: could not complete calculations')
-    def CalcDLf(self):
+    def CalcDLf(self): 
+        n_leaves = self.data["properties"].get("n_leaves")
         dims = self.data["dimensions"]
         Lf = dims.get("Lf")
         nef = dims.get("nef")
-        if (Lf != None and nef != None):
-            dims["dLf"] = Lf/nef
+        if (Lf != None and nef != None and n_leaves != None):
+            dims["dLf"] = Lf/n_leaves/nef
         else:
             raise Exception(f'Ld = {Lf}, nef = {nef}: could not complete calculations')
-    def CalcDAd(self):
-        dims = self.data["dimensions"]
-        Hc = dims.get("Hc")
-        dLd = dims.get("dLd")
-        if (Hc != None and dLd != None):
-            dims["dAd"] = Hc*dLd
-        else:
-            raise Exception(f'Hc = {Hc}, dLd = {dLd}: could not complete calculations')
-    def CalcDAf(self):
+    def CalcDAd(self): #channel area in draw flow direction
         dims = self.data["dimensions"]
         Hc = dims.get("Hc")
         dLf = dims.get("dLf")
         if (Hc != None and dLf != None):
-            dims["dAf"] = Hc*dLf
+            dims["dAd"] = Hc*dLf
         else:
             raise Exception(f'Hc = {Hc}, dLd = {dLf}: could not complete calculations')
+    def CalcDAf(self):
+        dims = self.data["dimensions"]
+        Hc = dims.get("Hc")
+        dLd = dims.get("dLd")
+        if (Hc != None and dLd != None):
+            dims["dAf"] = Hc*dLd
+        else:
+            raise Exception(f'Hc = {Hc}, dLd = {dLd}: could not complete calculations')
     def CalcDAm(self):
         dims = self.data["dimensions"]
         dLd = dims.get("dLd")

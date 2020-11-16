@@ -52,7 +52,7 @@ D = 9000 #mm
 A = 24.8e6 #m^2 play around with this until it looks good
 d_start = 243 #start in September just as evaporation is increasing for Summer
 d = d_start
-n_years = 2
+n_years = 5
 
 no_volume = {
     "A": A,
@@ -117,31 +117,63 @@ while d < (d_start+n_years*365):
         discharge[-1].data["flow"])
     d += 1
 
+#Pond time-series
+val_of_int = ["level", "pc_wt"]
+y_labels = ['Depth of solution in pond - d (mm)','Concentration NaCl - (%wt)']
+colours = ['g', 'r']
+legends = ['Solution Depth', 'Concentration']
+data = []
+for i in range(0, len(val_of_int)):
+    item = val_of_int[i]
+    data.append([])
+    for p in pond:
+        data[i].append(p.data.get(item))
+t = np.linspace(0, d-d_start, d-d_start+1)
 
-r.PlotTimeSeries(d, d_start, pond, 
-    list=["level", "pc_wt"],
-    x_label="Time - d (days)",
-    y_labels=['Depth of solution in pond - d (mm)','Concentration NaCl - (%wt)'],
-    colours=['g', 'r'],
-    legends=['Solution Depth', 'Concentration'])
+axes = []
+fig, ax = plt.subplots()
+axes.append(ax)
+axes[0].set_xlabel("Time - d (days)")
+axes[0].set_ylabel(y_labels[0])
+lines = axes[0].plot(t, data[0], colours[0])
+for i in range(1, len(val_of_int)):
+    axes.append(axes[-1].twinx())
+    axes[-1].set_ylabel(y_labels[i])
+    lines += axes[-1].plot(t, data[i], colours[i])
 
-r.PlotTimeSeries(d, d_start, pond, 
-    list=["level", "level_NaCl"],
-    x_label="Time - d (days)",
-    y_labels=['Depth of solution in pond - d (mm)','Thickness of solid NaCl in pond - d (mm)'],
-    colours=['g', 'b'],
-    legends=['Solution Depth', 'Salt Layer Thickness'])
+plt.legend(lines, legends,loc=9) #or bbox_to_anchor=(0.2, 1.0)
+plt.tight_layout()
+plt.savefig('./../capstone/images/pond-level-conc.png')
+plt.show()
 
-r.PlotTimeSeries(d, d_start, concentrate, 
-    list=["flow", "pc_wt"],
-    x_label="Time - d (days)",
-    y_labels=['Flow (L/d)','Concentration NaCl - (%wt)'],
-    colours=['g', 'b'],
-    legends=['Pond Draw Solution', 'Concentration'])
 
-r.PlotTimeSeries(d, d_start, discharge, 
-    list=["flow", "pc_wt"],
-    x_label="Time - d (days)",
-    y_labels=['Flow (L/d)','Concentration NaCl - (%wt)'],
-    colours=['g', 'b'],
-    legends=['PRO Discharge', 'Concentration'])
+
+
+
+val_of_int = ["level", "level_NaCl"]
+y_labels = ['Depth of solution in pond - d (mm)','Thickness of solid NaCl in pond - d (mm)']
+colours = ['g', 'b']
+legends = ['Solution Depth', 'Salt Layer Thickness']
+data = []
+for i in range(0, len(val_of_int)):
+    item = val_of_int[i]
+    data.append([])
+    for p in pond:
+        data[i].append(p.data.get(item))
+t = np.linspace(0, d-d_start, d-d_start+1)
+
+axes = []
+fig, ax = plt.subplots()
+axes.append(ax)
+axes[0].set_xlabel("Time - d (days)")
+axes[0].set_ylabel(y_labels[0])
+lines = axes[0].plot(t, data[0], colours[0])
+for i in range(1, len(val_of_int)):
+    axes.append(axes[-1].twinx())
+    axes[-1].set_ylabel(y_labels[i])
+    lines += axes[-1].plot(t, data[i], colours[i])
+
+plt.legend(lines, legends,loc=9) #or bbox_to_anchor=(0.2, 1.0)
+plt.tight_layout()
+plt.savefig('./../capstone/images/pond-salt-and-solution-level.png')
+plt.show()

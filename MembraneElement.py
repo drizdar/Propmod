@@ -44,6 +44,8 @@ def calculateElement(membrane, initial_draw, initial_feed, Jw_i):
     k, k_LH = f.MassTransportCoefficient(D/60/60, d_h, pc_wt, rho*1000, vel_d)
     Pd = bulk_draw.data.get("P")
     Pf = bulk_feed.data.get("P")
+    Cd = bulk_draw.data.get("molar_concentration")
+    Cf = bulk_feed.data.get("molar_concentration")
     dP = Pd-Pf
     #estimate Jw from bulk data
 
@@ -73,6 +75,8 @@ def calculateElement(membrane, initial_draw, initial_feed, Jw_i):
         k, k_LH = f.MassTransportCoefficient(D/60/60, d_h, pc_wt, rho*1000, vel_d)
         Pd = bulk_draw.data.get("P")
         Pf = bulk_feed.data.get("P")
+        Cd = bulk_draw.data.get("molar_concentration")
+        Cf = bulk_feed.data.get("molar_concentration")
         dP = Pd-Pf
 
         try:
@@ -82,4 +86,4 @@ def calculateElement(membrane, initial_draw, initial_feed, Jw_i):
         cr = abs(Jw_pre/Jw_post -1)
 
     Pd = final_draw.data.get("P")
-    return {"Jw": Jw_post, "Js": Js, "Pd": Pd, "Pf": Pf, "final_draw": final_draw, "final_feed": final_feed}
+    return {"Cd": Cd, "Cf": Cf, "Jw": Jw_post, "Js": Js, "Pd": Pd, "Pf": Pf, "final_draw": final_draw, "final_feed": final_feed}

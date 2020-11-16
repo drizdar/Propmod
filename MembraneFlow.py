@@ -37,6 +37,8 @@ def calculate(membrane, initial_draw, initial_feed):
     Js = np.zeros((nef, ned))
     PPd = np.zeros((nef, ned))
     PPf = np.zeros((nef, ned))
+    Cd = np.zeros((nef, ned))
+    Cf = np.zeros((nef, ned))
     Qdi = initial_draw.GetFlow("L/d")/24 
     Qfi = initial_feed.GetFlow("L/d")/24 
     PId = initial_draw.data.get("PI")
@@ -65,6 +67,8 @@ def calculate(membrane, initial_draw, initial_feed):
             else:
                 Jw[i][j] = ret['Jw']
                 Js[i][j] = ret['Js']
+                Cd[i][j] = ret['Cd']
+                Cf[i][j] = ret['Cf']
                 PPd[i][j] = ret['Pd']
                 PPf[i][j] = ret['Pf']
                 draw[i][j+1] = ret['final_draw']
@@ -81,4 +85,4 @@ def calculate(membrane, initial_draw, initial_feed):
     DeltaW = Jw_avg * Am
     SE = DeltaW * DeltaP / (Qdi+Qfi)
 
-    return [Jw, Jw_avg, Js, Js_avg, PPd, PPf, PDens, SE]
+    return [Cd, Cf, Jw, Jw_avg, Js, Js_avg, PPd, PPf, PDens, SE]
